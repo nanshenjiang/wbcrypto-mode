@@ -1,0 +1,7 @@
+#include <wbcrypto/wbsm4.h>
+
+WBCRYPTO_ff1_context *WBCRYPTO_wbsm4_ff1_init(WBCRYPTO_wbsm4_context *key, const uint8_t *twkbuf, size_t twklen, unsigned int radix)
+{
+    WBCRYPTO_ff1_context *ctx = WBCRYPTO_ff1_init(twkbuf, twklen, radix, key, (block128_f)WBCRYPTO_wbsm4_encrypt);
+    return ctx;
+}
