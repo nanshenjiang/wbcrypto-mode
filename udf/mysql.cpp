@@ -32,7 +32,9 @@ extern "C"
     char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error);
 }
 
-void fpe_enc_num(char *num, char *sample, int len, char *ret);
+void fpe_enc_phone(char *num, char *sample, int len, char *ret);
+
+void fpe_enc_idcard(char *num, char *sample, int len, char *ret);
 
 /*
  * fpe(plain, mode, sample)
@@ -90,7 +92,7 @@ bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 
     initid->max_length = args->lengths[0];
     initid->maybe_null = args->maybe_null;
-    initid->ptr = (char *)malloc(initid->max_length);
+    initid->ptr = (char *)malloc(initid->max_length + 1);
     if (initid->ptr == NULL)
     {
         strcpy(message, "could't allocate memory");
@@ -109,8 +111,19 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
 {
     int plain_len = initid->max_length;
 
-    fpe_enc_num(args->args[0], args->args[2], plain_len, initid->ptr);
+    if (strcmp(args->args[1], "phone") == 0)
+    {
+        fpe_enc_phone(args->args[0], args->args[2], plain_len, initid->ptr);
+    }
+    else if (strcmp(args->args[1], "idcard") == 0)
+    {
+        fpe_enc_idcard(args->args[0], args->args[2], plain_len, initid->ptr);
+    }
+    else if (strcmp(args->args[1], "address") == 0)
+    {
+    }
 
+    initid->ptr[plain_len] = '\0';
     *length = plain_len;
     memcpy(result, initid->ptr, plain_len);
 
@@ -120,12 +133,12 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
     return result;
 }
 
-void fpe_enc_num(char *num, char *sample, int len, char *ret)
+void fpe_enc_phone(char *phone, char *sample, int len, char *ret)
 {
     int i, j, k, tweak_len = 0;
     for (i = 0; i < len; i++)
     {
-        if (!isdigit(sample[i]))
+        if (isdigit(sample[i]))
         {
             ++tweak_len;
         }
@@ -137,11 +150,11 @@ void fpe_enc_num(char *num, char *sample, int len, char *ret)
     {
         if (isdigit(sample[i]))
         {
-            plain[j++] = num[i];
+            tweak[k++] = phone[i];
         }
         else
         {
-            tweak[k++] = uint8_t(num[i]);
+            plain[j++] = phone[i];
         }
     }
 
@@ -154,11 +167,62 @@ void fpe_enc_num(char *num, char *sample, int len, char *ret)
     {
         if (isdigit(sample[i]))
         {
-            ret[i] = num[i];
+            ret[i] = phone[i];
         }
         else
         {
             ret[i] = ans[j++];
         }
+    }
+}
+
+void fpe_enc_idcard(char *idcard, char *sample, int len, char *ret)
+{
+    int i, j, k, tweak_len = 0;
+    if (idcard[len] == 'X')
+    {
+        len--;
+    }
+    for (i = 0; i < len; i++)
+    {
+        if (isdigit(sample[i]))
+        {
+            ++tweak_len;
+        }
+    }
+    char plain[len - tweak_len];
+    char tweak[tweak_len];
+    char ans[len - tweak_len];
+    for (i = 0, j = 0, k = 0; i < len; i++)
+    {
+        if (isdigit(sample[i]))
+        {
+            tweak[k++] = idcard[i];
+        }
+        else
+        {
+            plain[j++] = idcard[i];
+        }
+    }
+
+    WBCRYPTO_sm4_context *sm4_ctx = WBCRYPTO_sm4_context_init();
+    WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
+    WBCRYPTO_ff1_context *ff1_ctx1 = WBCRYPTO_sm4_ff1_init(sm4_ctx, tweak, sizeof(tweak), 10);
+    WBCRYPTO_ff1_encrypt(ff1_ctx1, plain, ans);
+
+    for (i = 0, j = 0; i < len; i++)
+    {
+        if (isdigit(sample[i]))
+        {
+            ret[i] = idcard[i];
+        }
+        else
+        {
+            ret[i] = ans[j++];
+        }
+    }
+    if (idcard[len] == 'X')
+    {
+        ret[len] = 'X';
     }
 }
