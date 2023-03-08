@@ -7,26 +7,11 @@
 #include <wbcrypto/fpe.h>
 
 const uint8_t key[] = {
-    0x2b,
-    0x7e,
-    0x15,
-    0x16,
-    0x28,
-    0xae,
-    0xd2,
-    0xa6,
-    0xab,
-    0xf7,
-    0x15,
-    0x88,
-    0x09,
-    0xcf,
-    0x4f,
-    0x3c,
+    0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,
+    0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3c,
 };
 
-extern "C"
-{
+extern "C" {
     bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message);
     void fpe_deinit(UDF_INIT *initid);
     char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error);
@@ -40,61 +25,21 @@ void fpe_enc_idcard(char *num, char *sample, int len, char *ret);
  * fpe(plain, mode, sample)
  * fpe(plain, phone/idcard/address, "134xxxx5678")
  */
-bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
-{
-    if (args->arg_count != 3)
-    {
+bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message) {
+    if (args->arg_count != 3) {
         strcpy(message, "requires three argument");
         return 1;
     }
 
-    if (args->arg_type[0] != STRING_RESULT || args->arg_type[1] != STRING_RESULT || args->arg_type[2] != STRING_RESULT)
-    {
+    if (args->arg_type[0] != STRING_RESULT || args->arg_type[1] != STRING_RESULT || args->arg_type[2] != STRING_RESULT) {
         strcpy(message, "requires string as argument");
-        return 1;
-    }
-
-    if (args->lengths[0] != args->lengths[2])
-    {
-        strcpy(message, "sample should be as long as plain");
-        return 1;
-    }
-
-    if (strcmp(args->args[1], "phone") == 0)
-    {
-        if (args->lengths[0] != 11)
-        {
-            strcpy(message, "the length of phone should be 11");
-            return 1;
-        }
-    }
-    else if (strcmp(args->args[1], "idcard") == 0)
-    {
-        if (args->lengths[0] != 18)
-        {
-            strcpy(message, "the length of id-card should be 18");
-            return 1;
-        }
-    }
-    else if (strcmp(args->args[1], "address") == 0)
-    {
-        if (args->lengths[0] > 4096)
-        {
-            strcpy(message, "the length of address is too long");
-            return 1;
-        }
-    }
-    else
-    {
-        strcpy(message, "requires optional mode: phone or idcard or address");
         return 1;
     }
 
     initid->max_length = args->lengths[0];
     initid->maybe_null = args->maybe_null;
     initid->ptr = (char *)malloc(initid->max_length + 1);
-    if (initid->ptr == NULL)
-    {
+    if (initid->ptr == NULL) {
         strcpy(message, "could't allocate memory");
         return 1;
     }
@@ -102,28 +47,47 @@ bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
     return 0;
 }
 
-void fpe_deinit(UDF_INIT *initid)
-{
+void fpe_deinit(UDF_INIT *initid) {
     free(initid->ptr);
 }
 
-char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
-{
-    int plain_len = initid->max_length;
+char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error) {
+    char *plain = args->args[0];
+    char *mode = args->args[1];
+    char *sample = args->args[2];
+    int plain_len = args->lengths[0];
 
-    if (strcmp(args->args[1], "phone") == 0)
-    {
-        fpe_enc_phone(args->args[0], args->args[2], plain_len, initid->ptr);
-    }
-    else if (strcmp(args->args[1], "idcard") == 0)
-    {
-        fpe_enc_idcard(args->args[0], args->args[2], plain_len, initid->ptr);
-    }
-    else if (strcmp(args->args[1], "address") == 0)
-    {
+    if (plain_len != args->lengths[2]){
+        char msg[200];
+        sprintf(msg, "sample should be as long as plain, plain: %s, sample: %s", plain, sample);
+        strcpy(error, msg);
+        return NULL;
     }
 
+    memcpy(initid->ptr, plain, plain_len);
     initid->ptr[plain_len] = '\0';
+
+    if (strcmp(mode, "phone") == 0)
+    {
+        if (plain_len != 11){
+            strcpy(error, "the length of phone should be 11");
+            return NULL;
+        }
+        fpe_enc_phone(plain, sample, plain_len, initid->ptr);
+    } else if (strcmp(mode, "idcard") == 0)
+    {
+        if (plain_len != 18){
+            strcpy(error, "the length of id-card should be 18");
+            return NULL;
+        }
+        fpe_enc_idcard(plain, sample, plain_len, initid->ptr);
+    } else if (strcmp(mode, "address") == 0)
+    {
+    } else{
+        strcpy(error,  "requires optional mode: phone or idcard or address");
+        return NULL;
+    }
+
     *length = plain_len;
     memcpy(result, initid->ptr, plain_len);
 
@@ -176,8 +140,7 @@ void fpe_enc_phone(char *phone, char *sample, int len, char *ret)
     }
 }
 
-void fpe_enc_idcard(char *idcard, char *sample, int len, char *ret)
-{
+void fpe_enc_idcard(char *idcard, char *sample, int len, char *ret) {
     int i, j, k, tweak_len = 0;
     if (idcard[len] == 'X')
     {

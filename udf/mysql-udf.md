@@ -18,8 +18,9 @@ $ ps -ef | grep mysql
 $ sudo mysql -u root -p
 
 ## 修改root密码
+> use mysql;
 > ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'xxxx';
-flush privileges;
+> flush privileges;
 ```
 
 ```
