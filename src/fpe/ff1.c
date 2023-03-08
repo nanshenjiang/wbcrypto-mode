@@ -1,294 +1,355 @@
 #include <wbcrypto/fpe.h>
-#include "ffx.h"
-
-#include <arpa/inet.h>
-#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 #include <math.h>
+#include <assert.h>
+#include <openssl/bn.h>
+#include "fpe_locl.h"
 
-struct ff1_ctx
+// convert numeral string to number
+void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigned int len, BN_CTX *ctx)
 {
-    WBCRYPTO_ffx_context *ffx;
-};
+    BN_CTX_start(ctx);
+    BIGNUM *r = BN_CTX_get(ctx),
+           *x = BN_CTX_get(ctx);
 
-WBCRYPTO_ff1_context *WBCRYPTO_ff1_init(const uint8_t *twkbuf, size_t twklen, unsigned int radix,
-                                        void *cipher_ctx, block128_f block)
+    BN_set_word(Y, 0);
+    BN_set_word(r, radix);
+    for (int i = 0; i < len; ++i) {
+        // Y = Y * radix + X[i]
+        BN_set_word(x, X[i]);
+        BN_mul(Y, Y, r, ctx);
+        BN_add(Y, Y, x);
+    }
+
+    BN_CTX_end(ctx);
+    return;
+}
+
+// convert number to numeral string
+void num2str(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *ctx)
 {
-    struct ff1_ctx *ctx = malloc(sizeof(struct ff1_ctx));
-    if(!ctx){
-        goto cleanup;
-    }
-    /*
-     * maxlen for ff1 is 2**32
-     *
-     * if size_t can't hold 2**32, then limit maxlen
-     * to the maximum value that it *can* hold
-     */
-    const size_t maxtxtlen =
-        sizeof(maxtxtlen) <= 4 ? SIZE_MAX : ((size_t)1 << 32);
+    BN_CTX_start(ctx);
+    BIGNUM *dv = BN_CTX_get(ctx),
+           *rem = BN_CTX_get(ctx),
+           *r = BN_CTX_get(ctx),
+           *XX = BN_CTX_get(ctx);
 
-    ctx->ffx = ffx_ctx_create(
-                twkbuf, twklen,
-                maxtxtlen,
-                0, SIZE_MAX,
-                radix,
-                cipher_ctx, block);
-    if(!ctx->ffx){
-        goto cleanup;
+    BN_copy(XX, X);
+    BN_set_word(r, radix);
+    memset(Y, 0, len << 2);
+    
+    for (int i = len - 1; i >= 0; --i) {
+        // XX / r = dv ... rem
+        BN_div(dv, rem, XX, r, ctx);
+        // Y[i] = XX % r
+        Y[i] = BN_get_word(rem);
+        // XX = XX / r
+        BN_copy(XX, dv);
     }
-    return ctx;
+
+    BN_CTX_end(ctx);
+    return;
+}
+
+int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
+{
+    int ret = 0;
+    BIGNUM *bnum = BN_new(),
+        *y = BN_new(),
+        *c = BN_new(),
+        *anum = BN_new(),
+        *qpow_u = BN_new(),
+        *qpow_v = BN_new();
+    BN_CTX *bn_ctx = BN_CTX_new();
+
+    union {
+        long one;
+        char little;
+    } is_endian = { 1 };
+
+    unsigned int inlen = strlen(input);
+    unsigned int in[inlen], out[inlen];
+    map_chars(input, in);
+
+    memcpy(out, in, inlen << 2);
+    int u = floor2(inlen, 1);
+    int v = inlen - u;
+    unsigned int *A = out, *B = out + u;
+    pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
+
+    unsigned int temp = (unsigned int)ceil(v * log2(ctx->radix));
+    const int b = ceil2(temp, 3);
+    const int d = 4 * ceil2(b, 2) + 4;
+
+    int pad = ( (-ctx->tweaklen - b - 1) % 16 + 16 ) % 16;
+    int Qlen = ctx->tweaklen + pad + 1 + b;
+    unsigned char P[16];
+    unsigned char *Q = (unsigned char *)malloc(Qlen), *Bytes = (unsigned char *)malloc(b);
+
+    // initialize P
+    P[0] = 0x1;
+    P[1] = 0x2;
+    P[2] = 0x1;
+    P[7] = u % 256;
+    if (is_endian.little) {
+        temp = (ctx->radix << 8) | 10;
+        P[3] = (temp >> 24) & 0xff;
+        P[4] = (temp >> 16) & 0xff;
+        P[5] = (temp >> 8) & 0xff;
+        P[6] = temp & 0xff;
+        P[8] = (inlen >> 24) & 0xff;
+        P[9] = (inlen >> 16) & 0xff;
+        P[10] = (inlen >> 8) & 0xff;
+        P[11] = inlen & 0xff;
+        P[12] = (ctx->tweaklen >> 24) & 0xff;
+        P[13] = (ctx->tweaklen >> 16) & 0xff;
+        P[14] = (ctx->tweaklen >> 8) & 0xff;
+        P[15] = ctx->tweaklen & 0xff;
+    } else {
+        *( (unsigned int *)(P + 3) ) = (ctx->radix << 8) | 10;
+        *( (unsigned int *)(P + 8) ) = inlen;
+        *( (unsigned int *)(P + 12) ) = ctx->tweaklen;
+    }
+
+    // initialize Q
+    memcpy(Q, ctx->tweak, ctx->tweaklen);
+    memset(Q + ctx->tweaklen, 0x00, pad);
+    assert(ctx->tweaklen + pad - 1 <= Qlen);
+
+    unsigned char R[16];
+    int cnt = ceil2(d, 4) - 1;
+    int Slen = 16 + cnt * 16;
+    unsigned char *S = (unsigned char *)malloc(Slen);
+    for (int i = 0; i < FF1_ROUNDS; ++i) {
+        // v
+        int m = (i & 1)? v: u;
+
+        // i
+        Q[ctx->tweaklen + pad] = i & 0xff;
+        str2num(bnum, B, ctx->radix, inlen - m, bn_ctx);
+        int BytesLen = BN_bn2bin(bnum, Bytes);
+        memset(Q + Qlen - b, 0x00, b);
+
+        int qtmp = Qlen - BytesLen;
+        memcpy(Q + qtmp, Bytes, BytesLen);
+
+        // ii PRF(P || Q), P is always 16 bytes long
+        // AES_encrypt(P, R, &aes_enc_ctx);
+        (*ctx->block) (P, R, ctx->cipher_ctx);
+        int count = Qlen / 16;
+        unsigned char Ri[16];
+        unsigned char *Qi = Q;
+        for (int cc = 0; cc < count; ++cc) {
+            for (int j = 0; j < 16; ++j)    Ri[j] = Qi[j] ^ R[j];
+            // AES_encrypt(Ri, R, &aes_enc_ctx);
+            (*ctx->block) (Ri, R, ctx->cipher_ctx);
+            Qi += 16;
+        }
+
+        // iii 
+        unsigned char tmp[16], SS[16];
+        memset(S, 0x00, Slen);
+        assert(Slen >= 16);
+        memcpy(S, R, 16);
+        for (int j = 1; j <= cnt; ++j) {
+            memset(tmp, 0x00, 16);
+
+            if (is_endian.little) {
+                // convert to big endian
+                // full unroll
+                tmp[15] = j & 0xff;
+                tmp[14] = (j >> 8) & 0xff;
+                tmp[13] = (j >> 16) & 0xff;
+                tmp[12] = (j >> 24) & 0xff;
+            } else *( (unsigned int *)tmp + 3 ) = j;
+
+            for (int k = 0; k < 16; ++k)    tmp[k] ^= R[k];
+            // AES_encrypt(tmp, SS, &aes_enc_ctx);
+            (*ctx->block) (tmp, SS, ctx->cipher_ctx);
+            assert((S + 16 * j)[0] == 0x00);
+            assert(16 + 16 * j <= Slen);
+            memcpy(S + 16 * j, SS, 16);
+        }
+
+        // iv
+        BN_bin2bn(S, d, y);
+        // vi
+        // (num(A, radix, m) + y) % qpow(radix, m);
+        str2num(anum, A, ctx->radix, m, bn_ctx);
+        // anum = (anum + y) mod qpow_uv
+        if (m == u)    BN_mod_add(c, anum, y, qpow_u, bn_ctx);
+        else    BN_mod_add(c, anum, y, qpow_v, bn_ctx);
+
+        // swap A and B
+        assert(A != B);
+        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
+        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        num2str(c, B, ctx->radix, m, bn_ctx);
+    }
+    inverse_map_chars(out, output, inlen);
+
+    ret=1;
 cleanup:
-    return NULL;
+    BN_clear_free(anum);
+    BN_clear_free(bnum);
+    BN_clear_free(c);
+    BN_clear_free(y);
+    BN_clear_free(qpow_u);
+    BN_clear_free(qpow_v);
+    BN_CTX_free(bn_ctx);
+    free(Bytes);
+    free(Q);
+    free(S);
+    return ret;
 }
 
-void WBCRYPTO_ff1_free(WBCRYPTO_ff1_context *ctx)
+int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
 {
-    if(ctx){
-        if(ctx->ffx){
-            ffx_ctx_free(ctx->ffx);
-        }
-        free(ctx);
-    }
-}
+    int ret=0;
+    BIGNUM *bnum = BN_new(),
+           *y = BN_new(),
+           *c = BN_new(),
+           *anum = BN_new(),
+           *qpow_u = BN_new(),
+           *qpow_v = BN_new();
+    BN_CTX *bn_ctx = BN_CTX_new();
 
-/*
- * The comments below reference the steps of the algorithm described here:
- *
- * https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-38Gr1-draft.pdf
- */
-static int ff1_cipher(WBCRYPTO_ff1_context *ctx,
-                      const char *const input, char *const output,
-                      const uint8_t *T, size_t t,
-                      const int encrypt)
-{
-    /* Step 1 */
-    unsigned int n = strlen(input);
-    unsigned int u = n / 2;
-    unsigned int v = n - u;
+    union {
+        long one;
+        char little;
+    } is_endian = { 1 };
 
-    /* Step 3, 4 */
-    const unsigned int b =
-        ((unsigned int)ceil(log2(ctx->ffx->radix) * v) + 7) / 8;
-    const unsigned int d = 4 * ((b + 3) / 4) + 4;
+    unsigned int inlen = strlen(input);
+    unsigned int in[inlen], out[inlen];
+    map_chars(input, in);
 
-    const unsigned int p = 16;
-    const unsigned int r = ((d + 15) / 16) * 16;
+    memcpy(out, in, inlen << 2);
+    int u = floor2(inlen, 1);
+    int v = inlen - u;
+    unsigned int *A = out, *B = out + u;
+    pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
 
-    struct
-    {
-        void *buf;
-        size_t len;
-    } scratch;
+    unsigned int temp = (unsigned int)ceil(v * log2(ctx->radix));
+    const int b = ceil2(temp, 3);
+    const int d = 4 * ceil2(b, 2) + 4;
 
-    char *A, *B, *C;
-    uint8_t *P, *Q, *R;
-
-    unsigned int q;
-
-    bigint_t y, c;
-
-    /* use the default tweak when none is supplied */
-    if (T == NULL)
-    {
-        T = ctx->ffx->twk_buf;
-        t = ctx->ffx->twk_len;
-    }
-
-    /* check the text and tweak lengths */
-    if (n < ctx->ffx->txtminlen ||
-        n > ctx->ffx->txtmaxlen ||
-        t < ctx->ffx->twkminlen ||
-        (ctx->ffx->twkmaxlen > 0 &&
-         t > ctx->ffx->twkmaxlen))
-    {
-        return -EINVAL;
+    int pad = ( (-ctx->tweaklen - b - 1) % 16 + 16 ) % 16;
+    int Qlen = ctx->tweaklen + pad + 1 + b;
+    unsigned char P[16];
+    unsigned char *Q = (unsigned char *)malloc(Qlen), *Bytes = (unsigned char *)malloc(b);
+    // initialize P
+    P[0] = 0x1;
+    P[1] = 0x2;
+    P[2] = 0x1;
+    P[7] = u % 256;
+    if (is_endian.little) {
+        temp = (ctx->radix << 8) | 10;
+        P[3] = (temp >> 24) & 0xff;
+        P[4] = (temp >> 16) & 0xff;
+        P[5] = (temp >> 8) & 0xff;
+        P[6] = temp & 0xff;
+        P[8] = (inlen >> 24) & 0xff;
+        P[9] = (inlen >> 16) & 0xff;
+        P[10] = (inlen >> 8) & 0xff;
+        P[11] = inlen & 0xff;
+        P[12] = (ctx->tweaklen >> 24) & 0xff;
+        P[13] = (ctx->tweaklen >> 16) & 0xff;
+        P[14] = (ctx->tweaklen >> 8) & 0xff;
+        P[15] = ctx->tweaklen & 0xff;
+    } else {
+        *( (unsigned int *)(P + 3) ) = (ctx->radix << 8) | 10;
+        *( (unsigned int *)(P + 8) ) = inlen;
+        *( (unsigned int *)(P + 12) ) = ctx->tweaklen;
     }
 
-    /* the number of bytes in Q */
-    q = ((t + b + 1 + 15) / 16) * 16;
+    // initialize Q
+    memcpy(Q, ctx->tweak, ctx->tweaklen);
+    memset(Q + ctx->tweaklen, 0x00, pad);
+    assert(ctx->tweaklen + pad - 1 <= Qlen);
 
-    bigint_init(&y);
-    bigint_init(&c);
+    unsigned char R[16];
+    int cnt = ceil2(d, 4) - 1;
+    int Slen = 16 + cnt * 16;
+    unsigned char *S = (unsigned char *)malloc(Slen);
+    for (int i = FF1_ROUNDS - 1; i >= 0; --i) {
+        // v
+        int m = (i & 1)? v: u;
 
-    scratch.len = 3 * (v + 2) + p + q + r;
-    scratch.buf = malloc(scratch.len);
-    if (!scratch.buf)
-    {
-        bigint_deinit(&c);
-        bigint_deinit(&y);
-        return -ENOMEM;
-    }
+        // i
+        Q[ctx->tweaklen + pad] = i & 0xff;
+        str2num(anum, A, ctx->radix, inlen - m, bn_ctx);
+        memset(Q + Qlen - b, 0x00, b);
+        int BytesLen = BN_bn2bin(anum, Bytes);
+        int qtmp = Qlen - BytesLen;
+        memcpy(Q + qtmp, Bytes, BytesLen);
 
-    /*
-     * P, Q, and R at the front so that they are all 16-byte
-     * aligned. P and Q must remain adjacent since they are
-     * concatenated as part of the algorithm
-     */
-    P = scratch.buf;
-    Q = P + p;
-    R = Q + q;
-    A = R + r;
-    B = A + v + 2;
-    C = B + v + 2;
-
-    /* Step 2 */
-    if (encrypt)
-    {
-        memcpy(A, input + 0, u);
-        A[u] = '\0';
-        memcpy(B, input + u, v);
-        B[v] = '\0';
-    }
-    else
-    {
-        memcpy(B, input + 0, u);
-        B[u] = '\0';
-        memcpy(A, input + u, v);
-        A[v] = '\0';
-    }
-
-    /* Step 5 */
-    P[0] = 1;
-    P[1] = 2;
-    P[2] = 1;
-    P[3] = ctx->ffx->radix >> 16;
-    P[4] = ctx->ffx->radix >> 8;
-    P[5] = ctx->ffx->radix;
-    P[6] = 10;
-    P[7] = u;
-    *(uint32_t *)&P[8] = htonl(n);
-    *(uint32_t *)&P[12] = htonl(t);
-
-    /*
-     * Step 6i, partial
-     * these parts of @Q are static
-     */
-    memcpy(Q, T, t);
-    memset(Q + t, 0, q - (t + b + 1));
-
-    for (unsigned int i = 0; i < 10; i++)
-    {
-        /* Step 6v */
-        const unsigned int m = ((i + !!encrypt) % 2) ? u : v;
-
-        uint8_t *numb;
-        size_t numc;
-
-        /* Step 6i, partial */
-        Q[q - b - 1] = encrypt ? i : (9 - i);
-
-        /*
-         * convert the numeral string indicated by @B
-         * to an integer and then export that integer
-         * as a byte array representation and store
-         * it into @Q
-         */
-        bigint_set_str(&c, B, ctx->ffx->radix);
-        numb = bigint_export(&c, &numc);
-        if (b <= numc)
-        {
-            memcpy(&Q[q - b], numb, b);
-        }
-        else
-        {
-            /* pad on the left with zeros, if needed */
-            memset(&Q[q - b], 0, b - numc);
-            memcpy(&Q[q - numc], numb, numc);
-        }
-        free(numb);
-
-        /* Step 6ii */
-        ffx_prf(ctx->ffx, R, P, p + q);
-
-        /*
-         * Step 6iii:
-         * if r is greater than 16 (it will be a multiple of 16),
-         * fill the 2nd and subsequent blocks with the result
-         * of ciph(R ^ 1), ciph(R ^ 2), ...
-         */
-        for (unsigned int j = 1; j < r / 16; j++)
-        {
-            const unsigned int l = j * 16;
-
-            memset(&R[l], 0, 16 - sizeof(j));
-            *(unsigned int *)&R[l + (16 - sizeof(j))] = htonl(j);
-
-            ffx_memxor(&R[l], &R[0], &R[l], 16);
-
-            ffx_ciph(ctx->ffx, &R[l], &R[l]);
+        // ii PRF(P || Q)
+        memset(R, 0x00, sizeof(R));
+        // AES_encrypt(P, R, &aes_enc_ctx);
+        (*ctx->block) (P, R, ctx->cipher_ctx);
+        int count = Qlen / 16;
+        unsigned char Ri[16];
+        unsigned char *Qi = Q;
+        for (int cc = 0; cc < count; ++cc) {
+            for (int j = 0; j < 16; ++j)    Ri[j] = Qi[j] ^ R[j];
+            // AES_encrypt(Ri, R, &aes_enc_ctx);
+            (*ctx->block) (Ri, R, ctx->cipher_ctx);
+            Qi += 16;
         }
 
-        /*
-         * Step 6iv
-         * create an integer from the first @d bytes in @R
-         */
-        bigint_import(&y, R, d);
+        // iii 
+        unsigned char tmp[16], SS[16];
+        memset(S, 0x00, Slen);
+        memcpy(S, R, 16);
+        for (int j = 1; j <= cnt; ++j) {
+            memset(tmp, 0x00, 16);
 
-        /* Step 6vi */
-        /*
-         * create an integer from @A in the given radix.
-         * set @c to A +/- y
-         */
-        bigint_set_str(&c, A, ctx->ffx->radix);
-        if (encrypt)
-        {
-            bigint_add(&c, &c, &y);
+            if (is_endian.little) {
+                // convert to big endian
+                // full unroll
+                tmp[15] = j & 0xff;
+                tmp[14] = (j >> 8) & 0xff;
+                tmp[13] = (j >> 16) & 0xff;
+                tmp[12] = (j >> 24) & 0xff;
+            } else *( (unsigned int *)tmp + 3 ) = j;
+
+            for (int k = 0; k < 16; ++k)    tmp[k] ^= R[k];
+            // AES_encrypt(tmp, SS, &aes_enc_ctx);
+            (*ctx->block) (tmp, SS, ctx->cipher_ctx);
+            assert((S + 16 * j)[0] == 0x00);
+            memcpy(S + 16 * j, SS, 16);
         }
-        else
-        {
-            bigint_sub(&c, &c, &y);
-        }
-        /* set @y to radix**m */
-        bigint_set_ui(&y, ctx->ffx->radix);
-        bigint_pow_ui(&y, &y, m);
-        /* c = (A +/- y) mod radix**m */
-        bigint_mod(&c, &c, &y);
 
-        /* Step 6vii */
-        ffx_str(C, v + 2, m, ctx->ffx->radix, &c);
+        // iv
+        BN_bin2bn(S, d, y);
+        // vi
+        // (num(B, radix, m) - y) % qpow(radix, m);
+        str2num(bnum, B, ctx->radix, m, bn_ctx);
+        if (m == u)    BN_mod_sub(c, bnum, y, qpow_u, bn_ctx);
+        else    BN_mod_sub(c, bnum, y, qpow_v, bn_ctx);
 
-        {
-            char *const tmp = A;
-            /* Step 6viii */
-            A = B;
-            /* Step 6ix */
-            B = C;
-            C = tmp;
-        }
+        // swap A and B
+        assert(A != B);
+        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
+        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        num2str(c, A, ctx->radix, m, bn_ctx);
     }
+    inverse_map_chars(out, output, inlen);
 
-    /* Step 7 */
-    if (encrypt)
-    {
-        strcpy(output, A);
-        strcat(output, B);
-    }
-    else
-    {
-        strcpy(output, B);
-        strcat(output, A);
-    }
-
-    memset(scratch.buf, 0, scratch.len);
-    free(scratch.buf);
-
-    bigint_deinit(&c);
-    bigint_deinit(&y);
-
-    return 0;
-}
-
-int WBCRYPTO_ff1_encrypt(WBCRYPTO_ff1_context *ctx, const char *input, char *output)
-{
-    if(ff1_cipher(ctx, input, output, NULL, 0, 1)==0)
-        return 1;
-    else
-        return 0;
-}
-
-int WBCRYPTO_ff1_decrypt(WBCRYPTO_ff1_context *ctx, const char *input, char *output)
-{
-    if(ff1_cipher(ctx, input, output, NULL, 0, 0)==0)
-        return 1;
-    else
-        return 0;
+    ret=1;
+cleanup:
+    BN_clear_free(anum);
+    BN_clear_free(bnum);
+    BN_clear_free(y);
+    BN_clear_free(c);
+    BN_clear_free(qpow_u);
+    BN_clear_free(qpow_v);
+    BN_CTX_free(bn_ctx);
+    free(Bytes);
+    free(Q);
+    free(S);
+    return ret;
 }

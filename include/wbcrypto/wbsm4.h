@@ -152,14 +152,14 @@ extern "C" {
 
     /******************************************fpe-ff1 mode*********************************************/
     /**
-    * Create a context instance for use with the FF1 algorithm
+    * Create a context instance for use with the FF1 or FF3 algorithm
     * @param key the context of sm4-algorithm, must be init
     * @param twkbuf: Pointer to tweak data (may be NULL)
     * @param twklen: Number of bytes of tweak data (may be 0)
     * @param radix: The radix of the plain/cipher text data
     * @param return NULL is fault, otherwise successful
     */
-    WBCRYPTO_ff1_context *WBCRYPTO_wbsm4_ff1_init(WBCRYPTO_wbsm4_context *key, const uint8_t *twkbuf, size_t twklen, unsigned int radix);
+    WBCRYPTO_fpe_context *WBCRYPTO_wbsm4_fpe_init(WBCRYPTO_wbsm4_context *key, const uint8_t *twkbuf, size_t twklen, unsigned int radix);
 
 #ifdef __cplusplus
 }

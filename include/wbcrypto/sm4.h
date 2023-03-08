@@ -112,7 +112,7 @@ extern "C" {
     * @param radix: The radix of the plain/cipher text data
     * @param return NULL is fault, otherwise successful
     */
-    WBCRYPTO_ff1_context *WBCRYPTO_sm4_ff1_init(WBCRYPTO_sm4_context *key, const char *twkbuf, size_t twklen, unsigned int radix);
+    WBCRYPTO_fpe_context *WBCRYPTO_sm4_fpe_init(WBCRYPTO_sm4_context *key, const char *twkbuf, size_t twklen, unsigned int radix);
 
     /******************************************aux-fun(unimportance)*********************************************/
     /**
