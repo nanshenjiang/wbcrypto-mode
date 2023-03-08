@@ -10,7 +10,8 @@
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
-$ sudo mv ./build/out/libwbcrypto.so /usr/lib/
+$ sudo make install
+$ sudo cp -f ./out/libwbcrypto.so /usr/lib/
 ```
 
 ### 构建

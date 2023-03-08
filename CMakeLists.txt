@@ -4,7 +4,7 @@ project(wbcrypto-fpe)
 
 # option for opening openssl 
 option(IMPORT_OPENSSL "option for import openssl dependency" OFF)
-set(IMPORT_OPENSSL OFF)
+set(IMPORT_OPENSSL ON)
 if (IMPORT_OPENSSL)
     message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is imported into the environment")
 	add_definitions(-DIMPORT_OPENSSL)

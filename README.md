@@ -17,7 +17,7 @@
 - CBC模式
 - GCM模式
 - gcmfile模式 - 基于GCM模式加解密文件模式
-- FPE模式 - FF1加密格式
+- FPE模式 - FF1和FF3加密格式
 
 
 
@@ -55,10 +55,3 @@ $ sudo make install
 $ gcc test.c -o test -lwbcrypto -Wl,-rpath="/usr/local/lib"
 ```
 
-
-
-## Java
-
-本库基于JNA技术，提供java调用本白盒密码库的实例，具体可参考当前目录下的java文件夹，其中包含了相关配置文档和Java接口文档。
-
-**注意：当使用Java调用c时不建议开启OpenSSL加密模式（因为无进行OpenSSL的适配）。**
