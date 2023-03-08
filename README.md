@@ -25,21 +25,7 @@
 
 ### 快速开始
 
-请确保编译环境中含gcc和cmake环境，同时安装[gmp库](https://gmplib.org/#DOWNLOAD)，使用以下命令编译gmp库：
-
-```
-$ ./configure
-$ make
-$ sudo make install
-```
-
-至项目目录下使用以下命令快速编译：
-
-```
-$ mkdir build && cd build
-$ cmake ..
-$ make
-```
+请确保编译环境中含gcc和cmake环境，同时安装openssl库：
 
 目录{项目路径}/build/out目录下为头文件和编译库。
 
