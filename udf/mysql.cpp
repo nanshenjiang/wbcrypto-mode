@@ -160,8 +160,8 @@ void fpe_enc_phone(char *phone, char *sample, int len, char *ret)
 
     WBCRYPTO_sm4_context *sm4_ctx = WBCRYPTO_sm4_context_init();
     WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
-    WBCRYPTO_ff1_context *ff1_ctx1 = WBCRYPTO_sm4_ff1_init(sm4_ctx, tweak, sizeof(tweak), 10);
-    WBCRYPTO_ff1_encrypt(ff1_ctx1, plain, ans);
+    WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_sm4_fpe_init(sm4_ctx, tweak, sizeof(tweak), 10);
+    WBCRYPTO_ff1_encrypt(fpe_ctx, plain, ans);
 
     for (i = 0, j = 0; i < len; i++)
     {
@@ -207,8 +207,8 @@ void fpe_enc_idcard(char *idcard, char *sample, int len, char *ret)
 
     WBCRYPTO_sm4_context *sm4_ctx = WBCRYPTO_sm4_context_init();
     WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
-    WBCRYPTO_ff1_context *ff1_ctx1 = WBCRYPTO_sm4_ff1_init(sm4_ctx, tweak, sizeof(tweak), 10);
-    WBCRYPTO_ff1_encrypt(ff1_ctx1, plain, ans);
+    WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_sm4_fpe_init(sm4_ctx, tweak, sizeof(tweak), 10);
+    WBCRYPTO_ff1_encrypt(fpe_ctx, plain, ans);
 
     for (i = 0, j = 0; i < len; i++)
     {
