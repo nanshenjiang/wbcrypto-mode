@@ -26,7 +26,7 @@ link_directories(../build/out)
 add_library(udf SHARED mysql.cpp)
 
 # 链接所需的库文件
-target_link_libraries(udf mysqlclient wbcrypto -lgmp -lm)
+target_link_libraries(udf mysqlclient wbcrypto -lgmp -lm -O3)
 
 # 设置生成的库文件名
 set_target_properties(udf PROPERTIES PREFIX "")

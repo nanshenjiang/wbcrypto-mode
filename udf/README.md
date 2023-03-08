@@ -53,7 +53,7 @@ $ sudo make install
 ```
 ## 例子
 > SELECT phone, UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 100000;
->  SELECT fpe(phone,'phone','123xxxx4567'), UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 100000;
+> SELECT fpe(phone,'phone','123xxxx4567'), UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 100000;
 
 > SELECT BENCHMARK(100000, fpe('13912345678','phone', '134xxxx5678'));
 ```
