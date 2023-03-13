@@ -36,6 +36,7 @@ aux_source_directory(src/fpe wbcrypto_src)
 aux_source_directory(src/sm3 wbcrypto_src)
 aux_source_directory(src/sm4 wbcrypto_src)
 aux_source_directory(src/wbsm4 wbcrypto_src)
+aux_source_directory(src/fpe_app wbcrypto_src)
 
 # static library
 add_library(wbcrypto-static ${wbcrypto_src})
@@ -58,5 +59,5 @@ ELSE(UNIT_TEST)
     message(STATUS "${PROJECT_NAME} TEST OFF")
 ENDIF(UNIT_TEST)
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O2")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 

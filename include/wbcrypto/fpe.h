@@ -9,9 +9,7 @@
 extern "C" {
 #endif
 
-
-    struct fpe_ctx
-    {
+    struct fpe_ctx {
         void *cipher_ctx; // cipher context used
         block128_f block; // encryption algorithm
 

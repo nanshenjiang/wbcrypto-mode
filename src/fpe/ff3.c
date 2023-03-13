@@ -7,8 +7,7 @@
 // #include <openssl/aes.h>
 #include "fpe_locl.h"
 
-void rev_bytes(unsigned char X[], int len)
-{
+void rev_bytes(unsigned char X[], int len) {
     int hlen = len >> 1;
     for (int i = 0; i < hlen; ++i) {
         unsigned char tmp = X[i];
@@ -19,11 +18,10 @@ void rev_bytes(unsigned char X[], int len)
 }
 
 // convert numeral string in reverse order to number
-void str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned int len, BN_CTX *bn_ctx)
-{
+void str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned int len, BN_CTX *bn_ctx) {
     BN_CTX_start(bn_ctx);
     BIGNUM *r = BN_CTX_get(bn_ctx),
-           *x = BN_CTX_get(bn_ctx);
+            *x = BN_CTX_get(bn_ctx);
 
     BN_set_word(Y, 0);
     BN_set_word(r, radix);
@@ -39,18 +37,17 @@ void str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned 
 }
 
 // convert number to numeral string in reverse order
-void num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *bn_ctx)
-{
+void num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *bn_ctx) {
     BN_CTX_start(bn_ctx);
     BIGNUM *dv = BN_CTX_get(bn_ctx),
-           *rem = BN_CTX_get(bn_ctx),
-           *r = BN_CTX_get(bn_ctx),
-           *XX = BN_CTX_get(bn_ctx);
+            *rem = BN_CTX_get(bn_ctx),
+            *r = BN_CTX_get(bn_ctx),
+            *XX = BN_CTX_get(bn_ctx);
 
     BN_copy(XX, X);
     BN_set_word(r, radix);
     memset(Y, 0, len << 2);
-    
+
     for (int i = 0; i < len; ++i) {
         // XX / r = dv ... rem
         BN_div(dv, rem, XX, r, bn_ctx);
@@ -64,15 +61,14 @@ void num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, 
     return;
 }
 
-int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
-{
+int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
     int ret = 0;
-     BIGNUM *bnum = BN_new(),
-           *y = BN_new(),
-           *c = BN_new(),
-           *anum = BN_new(),
-           *qpow_u = BN_new(),
-           *qpow_v = BN_new();
+    BIGNUM *bnum = BN_new(),
+            *y = BN_new(),
+            *c = BN_new(),
+            *anum = BN_new(),
+            *qpow_u = BN_new(),
+            *qpow_v = BN_new();
     BN_CTX *bn_ctx = BN_CTX_new();
 
     // AES_KEY aes_enc_ctx;
@@ -91,11 +87,11 @@ int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     int v = inlen - u;
     unsigned int *A = out, *B = out + u;
     pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
-    unsigned int temp = (unsigned int)ceil(u * log2(ctx->radix));
+    unsigned int temp = (unsigned int) ceil(u * log2(ctx->radix));
     const int b = ceil2(temp, 3);
 
     unsigned char S[16], P[16];
-    unsigned char *Bytes = (unsigned char *)OPENSSL_malloc(b);
+    unsigned char *Bytes = (unsigned char *) OPENSSL_malloc(b);
 
     for (int i = 0; i < FF3_ROUNDS; ++i) {
         // i
@@ -112,14 +108,14 @@ int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         str2num_rev(bnum, B, ctx->radix, inlen - m, bn_ctx);
         memset(Bytes, 0x00, b);
         int BytesLen = BN_bn2bin(bnum, Bytes);
-        BytesLen = BytesLen > 12? 12: BytesLen;
+        BytesLen = BytesLen > 12 ? 12 : BytesLen;
         memset(P + 4, 0x00, 12);
         memcpy(P + 16 - BytesLen, Bytes, BytesLen);
 
         // iii
         rev_bytes(P, 16);
         // AES_encrypt(P, S, &aes_enc_ctx);
-        (*ctx->block) (P, S, ctx->cipher_ctx);
+        (*ctx->block)(P, S, ctx->cipher_ctx);
         rev_bytes(S, 16);
 
         // iv
@@ -127,19 +123,19 @@ int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
 
         // v
         str2num_rev(anum, A, ctx->radix, m, bn_ctx);
-        if (i & 1)    BN_mod_add(c, anum, y, qpow_v, bn_ctx);
-        else    BN_mod_add(c, anum, y, qpow_u, bn_ctx);
+        if (i & 1) BN_mod_add(c, anum, y, qpow_v, bn_ctx);
+        else BN_mod_add(c, anum, y, qpow_u, bn_ctx);
 
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
+        B = (unsigned int *) ((uintptr_t) B ^ (uintptr_t) A);
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
 
         num2str_rev(c, B, ctx->radix, m, bn_ctx);
     }
     inverse_map_chars(out, output, inlen);
 
-    ret=1;
+    ret = 1;
 cleanup:
     // free the space
     BN_clear_free(anum);
@@ -153,15 +149,14 @@ cleanup:
     return ret;
 }
 
-int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
-{
-    int ret=0;
+int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
+    int ret = 0;
     BIGNUM *bnum = BN_new(),
-           *y = BN_new(),
-           *c = BN_new(),
-           *anum = BN_new(),
-           *qpow_u = BN_new(),
-           *qpow_v = BN_new();
+            *y = BN_new(),
+            *c = BN_new(),
+            *anum = BN_new(),
+            *qpow_u = BN_new(),
+            *qpow_v = BN_new();
     BN_CTX *bn_ctx = BN_CTX_new();
 
     // AES_KEY aes_enc_ctx;
@@ -181,11 +176,11 @@ int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     int v = inlen - u;
     unsigned int *A = out, *B = out + u;
     pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
-    unsigned int temp = (unsigned int)ceil(u * log2(ctx->radix));
+    unsigned int temp = (unsigned int) ceil(u * log2(ctx->radix));
     const int b = ceil2(temp, 3);
 
     unsigned char S[16], P[16];
-    unsigned char *Bytes = (unsigned char *)OPENSSL_malloc(b);
+    unsigned char *Bytes = (unsigned char *) OPENSSL_malloc(b);
     for (int i = FF3_ROUNDS - 1; i >= 0; --i) {
         // i
         int m;
@@ -203,15 +198,15 @@ int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         str2num_rev(anum, A, ctx->radix, inlen - m, bn_ctx);
         memset(Bytes, 0x00, b);
         int BytesLen = BN_bn2bin(anum, Bytes);
-        BytesLen = BytesLen > 12? 12: BytesLen;
+        BytesLen = BytesLen > 12 ? 12 : BytesLen;
         memset(P + 4, 0x00, 12);
         memcpy(P + 16 - BytesLen, Bytes, BytesLen);
-       
+
         // iii
         rev_bytes(P, 16);
         memset(S, 0x00, sizeof(S));
         // AES_encrypt(P, S, &aes_enc_ctx);
-        (*ctx->block) (P, S, ctx->cipher_ctx);
+        (*ctx->block)(P, S, ctx->cipher_ctx);
         rev_bytes(S, 16);
 
         // iv
@@ -219,19 +214,19 @@ int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
 
         // v
         str2num_rev(bnum, B, ctx->radix, m, bn_ctx);
-        if (i & 1)    BN_mod_sub(c, bnum, y, qpow_v, bn_ctx);
-        else    BN_mod_sub(c, bnum, y, qpow_u, bn_ctx);
+        if (i & 1) BN_mod_sub(c, bnum, y, qpow_v, bn_ctx);
+        else BN_mod_sub(c, bnum, y, qpow_u, bn_ctx);
 
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
+        B = (unsigned int *) ((uintptr_t) B ^ (uintptr_t) A);
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
 
         num2str_rev(c, A, ctx->radix, m, bn_ctx);
     }
     inverse_map_chars(out, output, inlen);
 
-    ret=1;
+    ret = 1;
 cleanup:
     BN_clear_free(anum);
     BN_clear_free(bnum);

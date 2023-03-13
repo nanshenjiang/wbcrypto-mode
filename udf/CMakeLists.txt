@@ -5,9 +5,9 @@ project(fpe_udf)
 # 设置 C++ 标准为 C++11
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_C_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+# set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_C_FLAGS_DEBUG "-g")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
 # 设置编译类型为 Release
 set(CMAKE_BUILD_TYPE Release)

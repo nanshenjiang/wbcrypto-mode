@@ -14,6 +14,7 @@
 void pow_uv(BIGNUM *pow_u, BIGNUM *pow_v, unsigned int x, int u, int v, BN_CTX *ctx);
 
 void map_chars(const unsigned char str[], unsigned int result[]);
+
 void inverse_map_chars(unsigned result[], unsigned char str[], int len);
 
 //int log2(int x);

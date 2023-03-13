@@ -8,11 +8,10 @@
 // #include <openssl/aes.h>
 
 // convert numeral string to number
-void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigned int len, BN_CTX *ctx)
-{
+void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigned int len, BN_CTX *ctx) {
     BN_CTX_start(ctx);
     BIGNUM *r = BN_CTX_get(ctx),
-           *x = BN_CTX_get(ctx);
+            *x = BN_CTX_get(ctx);
 
     BN_set_word(Y, 0);
     BN_set_word(r, radix);
@@ -28,18 +27,17 @@ void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigne
 }
 
 // convert number to numeral string
-void num2str(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *ctx)
-{
+void num2str(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *ctx) {
     BN_CTX_start(ctx);
     BIGNUM *dv = BN_CTX_get(ctx),
-           *rem = BN_CTX_get(ctx),
-           *r = BN_CTX_get(ctx),
-           *XX = BN_CTX_get(ctx);
+            *rem = BN_CTX_get(ctx),
+            *r = BN_CTX_get(ctx),
+            *XX = BN_CTX_get(ctx);
 
     BN_copy(XX, X);
     BN_set_word(r, radix);
     memset(Y, 0, len << 2);
-    
+
     for (int i = len - 1; i >= 0; --i) {
         // XX / r = dv ... rem
         BN_div(dv, rem, XX, r, ctx);
@@ -53,21 +51,20 @@ void num2str(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_C
     return;
 }
 
-int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
-{
+int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
     int ret = 0;
     BIGNUM *bnum = BN_new(),
-        *y = BN_new(),
-        *c = BN_new(),
-        *anum = BN_new(),
-        *qpow_u = BN_new(),
-        *qpow_v = BN_new();
+            *y = BN_new(),
+            *c = BN_new(),
+            *anum = BN_new(),
+            *qpow_u = BN_new(),
+            *qpow_v = BN_new();
     BN_CTX *bn_ctx = BN_CTX_new();
 
     union {
         long one;
         char little;
-    } is_endian = { 1 };
+    } is_endian = {1};
 
     // AES_KEY aes_enc_ctx;
     // const uint8_t userKey[] = {
@@ -86,14 +83,14 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     unsigned int *A = out, *B = out + u;
     pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
 
-    unsigned int temp = (unsigned int)ceil(v * log2(ctx->radix));
+    unsigned int temp = (unsigned int) ceil(v * log2(ctx->radix));
     const int b = ceil2(temp, 3);
     const int d = 4 * ceil2(b, 2) + 4;
 
-    int pad = ( (-ctx->tweaklen - b - 1) % 16 + 16 ) % 16;
+    int pad = ((-ctx->tweaklen - b - 1) % 16 + 16) % 16;
     int Qlen = ctx->tweaklen + pad + 1 + b;
     unsigned char P[16];
-    unsigned char *Q = (unsigned char *)malloc(Qlen), *Bytes = (unsigned char *)malloc(b);
+    unsigned char *Q = (unsigned char *) malloc(Qlen), *Bytes = (unsigned char *) malloc(b);
 
     // initialize P
     P[0] = 0x1;
@@ -115,9 +112,9 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         P[14] = (ctx->tweaklen >> 8) & 0xff;
         P[15] = ctx->tweaklen & 0xff;
     } else {
-        *( (unsigned int *)(P + 3) ) = (ctx->radix << 8) | 10;
-        *( (unsigned int *)(P + 8) ) = inlen;
-        *( (unsigned int *)(P + 12) ) = ctx->tweaklen;
+        *((unsigned int *) (P + 3)) = (ctx->radix << 8) | 10;
+        *((unsigned int *) (P + 8)) = inlen;
+        *((unsigned int *) (P + 12)) = ctx->tweaklen;
     }
 
     // initialize Q
@@ -128,10 +125,10 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     unsigned char R[16];
     int cnt = ceil2(d, 4) - 1;
     int Slen = 16 + cnt * 16;
-    unsigned char *S = (unsigned char *)malloc(Slen);
+    unsigned char *S = (unsigned char *) malloc(Slen);
     for (int i = 0; i < FF1_ROUNDS; ++i) {
         // v
-        int m = (i & 1)? v: u;
+        int m = (i & 1) ? v : u;
 
         // i
         Q[ctx->tweaklen + pad] = i & 0xff;
@@ -144,14 +141,14 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
 
         // ii PRF(P || Q), P is always 16 bytes long
         // AES_encrypt(P, R, &aes_enc_ctx);
-        (*ctx->block) (P, R, ctx->cipher_ctx);
+        (*ctx->block)(P, R, ctx->cipher_ctx);
         int count = Qlen / 16;
         unsigned char Ri[16];
         unsigned char *Qi = Q;
         for (int cc = 0; cc < count; ++cc) {
-            for (int j = 0; j < 16; ++j)    Ri[j] = Qi[j] ^ R[j];
+            for (int j = 0; j < 16; ++j) Ri[j] = Qi[j] ^ R[j];
             // AES_encrypt(Ri, R, &aes_enc_ctx);
-            (*ctx->block) (Ri, R, ctx->cipher_ctx);
+            (*ctx->block)(Ri, R, ctx->cipher_ctx);
             Qi += 16;
         }
 
@@ -170,11 +167,11 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
                 tmp[14] = (j >> 8) & 0xff;
                 tmp[13] = (j >> 16) & 0xff;
                 tmp[12] = (j >> 24) & 0xff;
-            } else *( (unsigned int *)tmp + 3 ) = j;
+            } else *((unsigned int *) tmp + 3) = j;
 
-            for (int k = 0; k < 16; ++k)    tmp[k] ^= R[k];
+            for (int k = 0; k < 16; ++k) tmp[k] ^= R[k];
             // AES_encrypt(tmp, SS, &aes_enc_ctx);
-            (*ctx->block) (tmp, SS, ctx->cipher_ctx);
+            (*ctx->block)(tmp, SS, ctx->cipher_ctx);
             assert((S + 16 * j)[0] == 0x00);
             assert(16 + 16 * j <= Slen);
             memcpy(S + 16 * j, SS, 16);
@@ -186,19 +183,19 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         // (num(A, radix, m) + y) % qpow(radix, m);
         str2num(anum, A, ctx->radix, m, bn_ctx);
         // anum = (anum + y) mod qpow_uv
-        if (m == u)    BN_mod_add(c, anum, y, qpow_u, bn_ctx);
-        else    BN_mod_add(c, anum, y, qpow_v, bn_ctx);
+        if (m == u) BN_mod_add(c, anum, y, qpow_u, bn_ctx);
+        else BN_mod_add(c, anum, y, qpow_v, bn_ctx);
 
         // swap A and B
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
+        B = (unsigned int *) ((uintptr_t) B ^ (uintptr_t) A);
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
         num2str(c, B, ctx->radix, m, bn_ctx);
     }
     inverse_map_chars(out, output, inlen);
 
-    ret=1;
+    ret = 1;
 cleanup:
     BN_clear_free(anum);
     BN_clear_free(bnum);
@@ -213,21 +210,20 @@ cleanup:
     return ret;
 }
 
-int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output)
-{
-    int ret=0;
+int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
+    int ret = 0;
     BIGNUM *bnum = BN_new(),
-           *y = BN_new(),
-           *c = BN_new(),
-           *anum = BN_new(),
-           *qpow_u = BN_new(),
-           *qpow_v = BN_new();
+            *y = BN_new(),
+            *c = BN_new(),
+            *anum = BN_new(),
+            *qpow_u = BN_new(),
+            *qpow_v = BN_new();
     BN_CTX *bn_ctx = BN_CTX_new();
 
     union {
         long one;
         char little;
-    } is_endian = { 1 };
+    } is_endian = {1};
 
     // AES_KEY aes_enc_ctx;
     // const uint8_t userKey[] = {
@@ -246,14 +242,14 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     unsigned int *A = out, *B = out + u;
     pow_uv(qpow_u, qpow_v, ctx->radix, u, v, bn_ctx);
 
-    unsigned int temp = (unsigned int)ceil(v * log2(ctx->radix));
+    unsigned int temp = (unsigned int) ceil(v * log2(ctx->radix));
     const int b = ceil2(temp, 3);
     const int d = 4 * ceil2(b, 2) + 4;
 
-    int pad = ( (-ctx->tweaklen - b - 1) % 16 + 16 ) % 16;
+    int pad = ((-ctx->tweaklen - b - 1) % 16 + 16) % 16;
     int Qlen = ctx->tweaklen + pad + 1 + b;
     unsigned char P[16];
-    unsigned char *Q = (unsigned char *)malloc(Qlen), *Bytes = (unsigned char *)malloc(b);
+    unsigned char *Q = (unsigned char *) malloc(Qlen), *Bytes = (unsigned char *) malloc(b);
     // initialize P
     P[0] = 0x1;
     P[1] = 0x2;
@@ -274,9 +270,9 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         P[14] = (ctx->tweaklen >> 8) & 0xff;
         P[15] = ctx->tweaklen & 0xff;
     } else {
-        *( (unsigned int *)(P + 3) ) = (ctx->radix << 8) | 10;
-        *( (unsigned int *)(P + 8) ) = inlen;
-        *( (unsigned int *)(P + 12) ) = ctx->tweaklen;
+        *((unsigned int *) (P + 3)) = (ctx->radix << 8) | 10;
+        *((unsigned int *) (P + 8)) = inlen;
+        *((unsigned int *) (P + 12)) = ctx->tweaklen;
     }
 
     // initialize Q
@@ -287,10 +283,10 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
     unsigned char R[16];
     int cnt = ceil2(d, 4) - 1;
     int Slen = 16 + cnt * 16;
-    unsigned char *S = (unsigned char *)malloc(Slen);
+    unsigned char *S = (unsigned char *) malloc(Slen);
     for (int i = FF1_ROUNDS - 1; i >= 0; --i) {
         // v
-        int m = (i & 1)? v: u;
+        int m = (i & 1) ? v : u;
 
         // i
         Q[ctx->tweaklen + pad] = i & 0xff;
@@ -303,14 +299,14 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         // ii PRF(P || Q)
         memset(R, 0x00, sizeof(R));
         // AES_encrypt(P, R, &aes_enc_ctx);
-        (*ctx->block) (P, R, ctx->cipher_ctx);
+        (*ctx->block)(P, R, ctx->cipher_ctx);
         int count = Qlen / 16;
         unsigned char Ri[16];
         unsigned char *Qi = Q;
         for (int cc = 0; cc < count; ++cc) {
-            for (int j = 0; j < 16; ++j)    Ri[j] = Qi[j] ^ R[j];
+            for (int j = 0; j < 16; ++j) Ri[j] = Qi[j] ^ R[j];
             // AES_encrypt(Ri, R, &aes_enc_ctx);
-            (*ctx->block) (Ri, R, ctx->cipher_ctx);
+            (*ctx->block)(Ri, R, ctx->cipher_ctx);
             Qi += 16;
         }
 
@@ -328,11 +324,11 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
                 tmp[14] = (j >> 8) & 0xff;
                 tmp[13] = (j >> 16) & 0xff;
                 tmp[12] = (j >> 24) & 0xff;
-            } else *( (unsigned int *)tmp + 3 ) = j;
+            } else *((unsigned int *) tmp + 3) = j;
 
-            for (int k = 0; k < 16; ++k)    tmp[k] ^= R[k];
+            for (int k = 0; k < 16; ++k) tmp[k] ^= R[k];
             // AES_encrypt(tmp, SS, &aes_enc_ctx);
-            (*ctx->block) (tmp, SS, ctx->cipher_ctx);
+            (*ctx->block)(tmp, SS, ctx->cipher_ctx);
             assert((S + 16 * j)[0] == 0x00);
             memcpy(S + 16 * j, SS, 16);
         }
@@ -342,19 +338,19 @@ int WBCRYPTO_ff1_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         // vi
         // (num(B, radix, m) - y) % qpow(radix, m);
         str2num(bnum, B, ctx->radix, m, bn_ctx);
-        if (m == u)    BN_mod_sub(c, bnum, y, qpow_u, bn_ctx);
-        else    BN_mod_sub(c, bnum, y, qpow_v, bn_ctx);
+        if (m == u) BN_mod_sub(c, bnum, y, qpow_u, bn_ctx);
+        else BN_mod_sub(c, bnum, y, qpow_v, bn_ctx);
 
         // swap A and B
         assert(A != B);
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
-        B = (unsigned int *)( (uintptr_t)B ^ (uintptr_t)A );
-        A = (unsigned int *)( (uintptr_t)A ^ (uintptr_t)B );
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
+        B = (unsigned int *) ((uintptr_t) B ^ (uintptr_t) A);
+        A = (unsigned int *) ((uintptr_t) A ^ (uintptr_t) B);
         num2str(c, A, ctx->radix, m, bn_ctx);
     }
     inverse_map_chars(out, output, inlen);
 
-    ret=1;
+    ret = 1;
 cleanup:
     BN_clear_free(anum);
     BN_clear_free(bnum);
