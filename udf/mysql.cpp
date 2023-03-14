@@ -3,12 +3,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <mysql.h>
-#include <wbcrypto/sm4.h>
-#include <wbcrypto/fpe.h>
+#include <wbcrypto/fpe_app.h>
 
 const uint8_t key[] = {
-        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
+    0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
 };
 
 extern "C" {
@@ -16,10 +15,6 @@ extern "C" {
     void fpe_deinit(UDF_INIT *initid);
     char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error);
 }
-
-void fpe_enc_phone(char *num, char *sample, int len, char *ret);
-
-void fpe_enc_idcard(char *num, char *sample, int len, char *ret);
 
 /*
  * fpe(plain, mode, sample)
@@ -68,20 +63,23 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
     memcpy(initid->ptr, plain, plain_len);
     initid->ptr[plain_len] = '\0';
 
+    WBCRYPTO_fpe_app_context app_ctx;
+    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), "sm4", "ff1");
+
     if (strcmp(mode, "phone") == 0) {
         if (plain_len != 11) {
             strcpy(error, "the length of phone should be 11");
             return NULL;
         }
-        fpe_e
-                nc_phone(plain, sample, plain_len, initid->ptr);
+        WBCRYPTO_fpe_encrypt_phone(&app_ctx, plain, sample, initid->ptr);
     } else if (strcmp(mode, "idcard") == 0) {
         if (plain_len != 18) {
             strcpy(error, "the length of id-card should be 18");
             return NULL;
         }
-        fpe_enc_idcard(plain, sample, plain_len, initid->ptr);
+        WBCRYPTO_fpe_encrypt_idcard(&app_ctx, plain, sample, initid->ptr);
     } else if (strcmp(mode, "address") == 0) {
+        WBCRYPTO_fpe_encrypt_address(&app_ctx, plain, sample, initid->ptr);
     } else {
         strcpy(error, "requires optional mode: phone or idcard or address");
         return NULL;
@@ -94,74 +92,4 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
     // sprintf(ret, "%s", result);
 
     return result;
-}
-
-void fpe_enc_phone(char *phone, char *sample, int len, char *ret) {
-    int i, j, k, tweak_len = 0;
-    for (i = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            ++tweak_len;
-        }
-    }
-    char plain[len - tweak_len];
-    char tweak[tweak_len];
-    char ans[len - tweak_len];
-    for (i = 0, j = 0, k = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            tweak[k++] = phone[i];
-        } else {
-            plain[j++] = phone[i];
-        }
-    }
-
-    WBCRYPTO_sm4_context *sm4_ctx = WBCRYPTO_sm4_context_init();
-    WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
-    WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_sm4_fpe_init(sm4_ctx, tweak, sizeof(tweak), 10);
-    WBCRYPTO_ff1_encrypt(fpe_ctx, plain, ans);
-
-    for (i = 0, j = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            ret[i] = phone[i];
-        } else {
-            ret[i] = ans[j++];
-        }
-    }
-}
-
-void fpe_enc_idcard(char *idcard, char *sample, int len, char *ret) {
-    int i, j, k, tweak_len = 0;
-    if (idcard[len] == 'X') {
-        len--;
-    }
-    for (i = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            ++tweak_len;
-        }
-    }
-    char plain[len - tweak_len];
-    char tweak[tweak_len];
-    char ans[len - tweak_len];
-    for (i = 0, j = 0, k = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            tweak[k++] = idcard[i];
-        } else {
-            plain[j++] = idcard[i];
-        }
-    }
-
-    WBCRYPTO_sm4_context *sm4_ctx = WBCRYPTO_sm4_context_init();
-    WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
-    WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_sm4_fpe_init(sm4_ctx, tweak, sizeof(tweak), 10);
-    WBCRYPTO_ff1_encrypt(fpe_ctx, plain, ans);
-
-    for (i = 0, j = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            ret[i] = idcard[i];
-        } else {
-            ret[i] = ans[j++];
-        }
-    }
-    if (idcard[len] == 'X') {
-        ret[len] = 'X';
-    }
 }

@@ -38,6 +38,10 @@ extern "C" {
 
     int WBCRYPTO_fpe_decrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *after_idcard);
 
+    int WBCRYPTO_fpe_encrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, char *after_address);
+
+    int WBCRYPTO_fpe_decrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, char *after_address);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,4 +1,5 @@
 #include <wbcrypto/fpe_app.h>
+#include <wbcrypto/aes.h>
 #include <wbcrypto/sm4.h>
 #include <wbcrypto/wbsm4.h>
 #include <string.h>
@@ -33,11 +34,11 @@ int aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, ch
     if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_SM4) == 0) {
         fpe_ctx = WBCRYPTO_sm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_WBSM4) == 0) {
-        WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
+        fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_AES) == 0) {
-        // todo 加入aes
-    } else {
-        // default: aes
+        fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
+    } else { // default: aes
+        fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     }
     (*block)(fpe_ctx, input, ans);
 

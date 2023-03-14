@@ -1,4 +1,5 @@
 #include <wbcrypto/fpe_app.h>
+#include <wbcrypto/aes.h>
 #include <wbcrypto/sm4.h>
 #include <wbcrypto/wbsm4.h>
 #include <string.h>
@@ -10,7 +11,7 @@ int aux_fpe_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *sample, char
     int i, j, k, tweak_len = 0;
 
     for (i = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
+        if (sample[i] != 'x') {
             ++tweak_len;
         }
     }
@@ -31,16 +32,16 @@ int aux_fpe_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *sample, char
     if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_SM4) == 0) {
         fpe_ctx = WBCRYPTO_sm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_WBSM4) == 0) {
-        WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
+        fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_AES) == 0) {
-        // todo 加入aes
-    } else {
-        // default: aes
+        fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
+    } else { //default:aes
+        fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     }
     (*block)(fpe_ctx, input, ans);
 
     for (i = 0, j = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
+        if (sample[i] != 'x') {
             after_phone[i] = phone[i];
         } else {
             after_phone[i] = ans[j++];

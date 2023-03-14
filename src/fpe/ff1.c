@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <openssl/bn.h>
 #include "fpe_locl.h"
-// #include <openssl/aes.h>
 
 // convert numeral string to number
 void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigned int len, BN_CTX *ctx) {
@@ -23,7 +22,6 @@ void str2num(BIGNUM *Y, const unsigned int *X, unsigned long long radix, unsigne
     }
 
     BN_CTX_end(ctx);
-    return;
 }
 
 // convert number to numeral string
@@ -48,7 +46,6 @@ void num2str(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_C
     }
 
     BN_CTX_end(ctx);
-    return;
 }
 
 int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
@@ -65,13 +62,6 @@ int WBCRYPTO_ff1_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
         long one;
         char little;
     } is_endian = {1};
-
-    // AES_KEY aes_enc_ctx;
-    // const uint8_t userKey[] = {
-    //     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-    //     0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
-    // };
-    // AES_set_encrypt_key(userKey, 128, &aes_enc_ctx);
 
     unsigned int inlen = strlen(input);
     unsigned int in[inlen], out[inlen];
