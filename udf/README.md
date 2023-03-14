@@ -31,6 +31,17 @@ $ cmake ..
 $ make -j
 $ sudo make install
 ```
+MySQL8版本将其中cmake命令改为：
+```
+$ cmake -DMYSQL8=1 ..
+```
+```
+## 在当前目录udf/下编译库
+$ mkdir build && cd build
+$ cmake ..
+$ make -j
+$ sudo make install
+```
 输入mysql -uroot -p进行数据库操作界面：
 ```
 ## 创建udf函数
@@ -48,7 +59,7 @@ $ sudo make install
 ## mysql 5.x版本
 > SELECT fpe('13912345678','phone', '134xxxx5678');
 > SELECT fpe('441412345678901234','idcard', '4414xxxxxxxxxx1234');
-> SELECT fpe('广东省广州市天河区华南师范大学','address', 'xx省xx市xx区xxxxxx);
+> SELECT fpe('广东省广州市天河区华南师范大学','address', 'xx省xx市xx区xxxxxx');
 
 ## mysql 8.x版本
 > SELECT cast(fpe('13912345678','phone', '134xxxx5678') as char);
