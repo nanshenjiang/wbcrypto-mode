@@ -10,10 +10,6 @@
 #define WBCYRPTO_FPE_FFX_FF1 "ff1"
 #define WBCYRPTO_FPE_FFX_FF3 "ff3"
 
-#define WBCYRPTO_FPE_TYPE_PHONE "phone"
-#define WBCYRPTO_FPE_TYPE_ADDRESS "address"
-#define WBCYRPTO_FPE_TYPE_IDCARD "idcard"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,17 +26,29 @@ extern "C" {
 
     int WBCRYPTO_fpe_app_init(WBCRYPTO_fpe_app_context *ctx, const uint8_t *key, size_t keylen, char *cipher, char *ffx);
 
-    int WBCRYPTO_fpe_encrypt_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *sample, char *after_phone);
+    int WBCRYPTO_fpe_encrypt_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *after_phone);
 
-    int WBCRYPTO_fpe_decrypt_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *sample, char *after_phone);
+    int WBCRYPTO_fpe_decrypt_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *after_phone);
 
-    int WBCRYPTO_fpe_encrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *after_idcard);
+    int WBCRYPTO_fpe_encrypt_phone_with_sample(WBCRYPTO_fpe_app_context *ctx, char *phone, char *after_phone, char *sample);
 
-    int WBCRYPTO_fpe_decrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *after_idcard);
+    int WBCRYPTO_fpe_decrypt_phone_with_sample(WBCRYPTO_fpe_app_context *ctx, char *phone, char *after_phone, char *sample);
 
-    int WBCRYPTO_fpe_encrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, char *after_address);
+    int WBCRYPTO_fpe_encrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard);
 
-    int WBCRYPTO_fpe_decrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, char *after_address);
+    int WBCRYPTO_fpe_decrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard);
+
+    int WBCRYPTO_fpe_encrypt_idcard_with_sample(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard, char *sample);
+
+    int WBCRYPTO_fpe_decrypt_idcard_with_sample(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard, char *sample);
+
+    int WBCRYPTO_fpe_encrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address);
+
+    int WBCRYPTO_fpe_decrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address);
+
+    int WBCRYPTO_fpe_encrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample);
+
+    int WBCRYPTO_fpe_decrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample);
 
 #ifdef __cplusplus
 }

@@ -4,9 +4,18 @@
 
 ### 预备操作
 
-先到前面目录wbcrypt-fpe编译系统
+#### 环境准备
 
 ```
+## 安装mysql和mysql开发库
+$ sudo apt-get update && sudo apt upgrade
+$ sudo apt install mysql-server-5.7
+$ sudo apt-get install build-essential libmysqlclient-dev
+```
+
+#### 编译wbcrypto-fpe密码库
+```
+## 在目录wbcrypt-fpe/下编译库
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
@@ -15,14 +24,14 @@ $ sudo cp -f ./out/libwbcrypto.so /usr/lib/
 ```
 
 ### 构建
-到当前目录udf编译系统
 ```
+## 在当前目录udf/下编译库
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
 $ sudo make install
 ```
-
+输入mysql -uroot -p进行数据库操作界面：
 ```
 ## 创建udf函数
 > CREATE FUNCTION fpe RETURNS string SONAME 'udf.so';
@@ -30,13 +39,22 @@ $ sudo make install
 ## 移除udf函数
 > DROP FUNCTION fpe;
 
-## 使用udf函数
-> fpe('13912345678','phone', '134xxxx5678')
-> SELECT cast(fpe('13912345678','phone', '134xxxx5678') as char);
-> SELECT cast(fpe('441412345678901234','idcard', '4414xxxxxxxxxx1234') as char);
-
 ## 查询安装列表
 > select * from mysql.func;
+```
+
+### 使用
+```
+## mysql 5.x版本
+> SELECT fpe('13912345678','phone', '134xxxx5678');
+> SELECT fpe('441412345678901234','idcard', '4414xxxxxxxxxx1234');
+> SELECT fpe('广东省广州市天河区华南师范大学','address', 'xx省xx市xx区xxxxxx);
+
+## mysql 8.x版本
+> SELECT cast(fpe('13912345678','phone', '134xxxx5678') as char);
+
+## 使用fpe查询数据表（假设存在test数据表，数据列为phone）
+> SELECT fpe(phone,'phone', '134xxxx5678') from test limit 100;
 ```
 
 ### 测试

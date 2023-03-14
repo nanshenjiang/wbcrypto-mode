@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.9.0)
 project(fpe_udf)
 
 # 设置 C++ 标准为 C++11
-set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_STANDARD 11)
 
 # set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_C_FLAGS_DEBUG "-g")
@@ -26,10 +26,13 @@ link_directories(../build/out)
 add_library(udf SHARED mysql.cpp)
 
 # 链接所需的库文件
-target_link_libraries(udf mysqlclient wbcrypto -lgmp -lm -O3)
+target_link_libraries(udf mysqlclient wbcrypto -lgmp -lm)
 
 # 设置生成的库文件名
 set_target_properties(udf PROPERTIES PREFIX "")
 
 # 将库文件复制到 MySQL 插件目录中
 install(TARGETS udf DESTINATION /usr/lib/mysql/plugin)
+
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wl,-rpath=\"/usr/local/lib\" -O3")
+

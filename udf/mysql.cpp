@@ -6,8 +6,8 @@
 #include <wbcrypto/fpe_app.h>
 
 const uint8_t key[] = {
-    0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-    0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
 };
 
 extern "C" {
@@ -18,18 +18,25 @@ extern "C" {
 
 /*
  * fpe(plain, mode, sample)
- * fpe(plain, phone/idcard/address, "134xxxx5678")
+ * fpe(plain, phone/idcard/address)
+ * fpe(plain, phone/idcard/address, "xxxxxxxxxx")
  */
 bool fpe_init(UDF_INIT *initid, UDF_ARGS *args, char *message) {
-    if (args->arg_count != 3) {
-        strcpy(message, "requires three argument");
+    if (args->arg_count < 2 || args->arg_count > 3) {
+        strcpy(message, "requires two or three argument");
         return 1;
     }
 
-    if (args->arg_type[0] != STRING_RESULT || args->arg_type[1] != STRING_RESULT ||
-        args->arg_type[2] != STRING_RESULT) {
+    if (args->arg_type[0] != STRING_RESULT || args->arg_type[1] != STRING_RESULT) {
         strcpy(message, "requires string as argument");
         return 1;
+    }
+
+    if (args->arg_count == 3) {
+        if (args->arg_type[2] != STRING_RESULT) {
+            strcpy(message, "requires string as argument");
+            return 1;
+        }
     }
 
     initid->max_length = args->lengths[0];
@@ -50,14 +57,17 @@ void fpe_deinit(UDF_INIT *initid) {
 char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error) {
     char *plain = args->args[0];
     char *mode = args->args[1];
-    char *sample = args->args[2];
+    char *sample;
     int plain_len = args->lengths[0];
 
-    if (plain_len != args->lengths[2]) {
-        char msg[200];
-        sprintf(msg, "sample should be as long as plain, plain: %s, sample: %s", plain, sample);
-        strcpy(error, msg);
-        return NULL;
+    if (args->arg_count == 3) {
+        sample = args->args[2];
+        if (plain_len != args->lengths[2] && strcmp(mode, "address") != 0) {
+            char msg[200];
+            sprintf(msg, "sample should be as long as plain, plain: %s, sample: %s", plain, sample);
+            strcpy(error, msg);
+            return NULL;
+        }
     }
 
     memcpy(initid->ptr, plain, plain_len);
@@ -71,15 +81,27 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
             strcpy(error, "the length of phone should be 11");
             return NULL;
         }
-        WBCRYPTO_fpe_encrypt_phone(&app_ctx, plain, sample, initid->ptr);
+        if (args->arg_count == 3) {
+            WBCRYPTO_fpe_encrypt_phone_with_sample(&app_ctx, plain, initid->ptr, sample);
+        }else {
+            WBCRYPTO_fpe_encrypt_phone(&app_ctx, plain, initid->ptr);
+        }
     } else if (strcmp(mode, "idcard") == 0) {
         if (plain_len != 18) {
             strcpy(error, "the length of id-card should be 18");
             return NULL;
         }
-        WBCRYPTO_fpe_encrypt_idcard(&app_ctx, plain, sample, initid->ptr);
+        if (args->arg_count == 3) {
+            WBCRYPTO_fpe_encrypt_idcard_with_sample(&app_ctx, plain, initid->ptr, sample);
+        }else {
+            WBCRYPTO_fpe_encrypt_idcard(&app_ctx, plain, initid->ptr);
+        }
     } else if (strcmp(mode, "address") == 0) {
-        WBCRYPTO_fpe_encrypt_address(&app_ctx, plain, sample, initid->ptr);
+        if (args->arg_count == 3) {
+            WBCRYPTO_fpe_encrypt_address_with_sample(&app_ctx, plain, initid->ptr, sample);
+        }else {
+            WBCRYPTO_fpe_encrypt_address(&app_ctx, plain, initid->ptr);
+        }
     } else {
         strcpy(error, "requires optional mode: phone or idcard or address");
         return NULL;

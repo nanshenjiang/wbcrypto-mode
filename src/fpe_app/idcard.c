@@ -9,26 +9,28 @@ int aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, ch
     int ret = 0;
     int len = strlen(idcard);
     int i, j, k, tweak_len = 0;
-    if (idcard[len] == 'X') {
+    if (idcard[len-1] == 'X') {
         len--;
     }
-    for (i = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
-            ++tweak_len;
+    if (strcmp(sample, "") != 0) {
+        for (i = 0; i < len; i++) {
+            if (sample[i] != 'x') {
+                ++tweak_len;
+            }
         }
     }
     char input[len - tweak_len + 1];
-    input[len - tweak_len] = '\0';
     char tweak[tweak_len + 1];
-    tweak[tweak_len] = '\0';
     char ans[len - tweak_len];
     for (i = 0, j = 0, k = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
+        if (strcmp(sample, "") != 0 && sample[i] != 'x') {
             tweak[k++] = idcard[i];
         } else {
             input[j++] = idcard[i];
         }
     }
+    input[len - tweak_len] = '\0';
+    tweak[tweak_len] = '\0';
 
     WBCRYPTO_fpe_context *fpe_ctx;
     if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_SM4) == 0) {
@@ -43,7 +45,7 @@ int aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, ch
     (*block)(fpe_ctx, input, ans);
 
     for (i = 0, j = 0; i < len; i++) {
-        if (isdigit(sample[i])) {
+        if (strcmp(sample, "") != 0 && sample[i] != 'x') {
             after_idcard[i] = idcard[i];
         } else {
             after_idcard[i] = ans[j++];
@@ -59,7 +61,15 @@ cleanup:
     return ret;
 }
 
-int WBCRYPTO_fpe_encrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *after_idcard) {
+int WBCRYPTO_fpe_encrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard) {
+    return WBCRYPTO_fpe_encrypt_idcard_with_sample(ctx, idcard, after_idcard, "");
+}
+
+int WBCRYPTO_fpe_decrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard) {
+    return WBCRYPTO_fpe_decrypt_idcard_with_sample(ctx, idcard, after_idcard, "");
+}
+
+int WBCRYPTO_fpe_encrypt_idcard_with_sample(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard, char *sample) {
     fpe_block128_f block;
     if (strcmp(ctx->ffx, WBCYRPTO_FPE_FFX_FF1) == 0) {
         block = (fpe_block128_f) WBCRYPTO_ff1_encrypt;
@@ -71,7 +81,7 @@ int WBCRYPTO_fpe_encrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, cha
     return aux_fpe_idcard(ctx, idcard, sample, after_idcard, block);
 }
 
-int WBCRYPTO_fpe_decrypt_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *after_idcard) {
+int WBCRYPTO_fpe_decrypt_idcard_with_sample(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard, char *sample) {
     fpe_block128_f block;
     if (strcmp(ctx->ffx, WBCYRPTO_FPE_FFX_FF1) == 0) {
         block = (fpe_block128_f) WBCRYPTO_ff1_decrypt;
