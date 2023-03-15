@@ -12,7 +12,7 @@ $ mysql -uroot -p
 
 ## 生成随机数据
 ```asm
-$ pip install -r requirments_insert.txt
+$ pip install -r requirements.insert.txt
 $ python insert_mysql.py
 ```
 修改password为数据库密码
@@ -21,7 +21,7 @@ $ python insert_mysql.py
 
 ## 简单的透明代理
 ```asm
-$ pip install -r requirments_proxy.txt
+$ pip install -r requirements.proxy.txt
 $ python trans_proxy.py
 ```
 修改password为数据库密码
