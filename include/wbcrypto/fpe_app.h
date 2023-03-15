@@ -42,13 +42,13 @@ extern "C" {
 
     int WBCRYPTO_fpe_decrypt_idcard_with_sample(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *after_idcard, char *sample);
 
-    int WBCRYPTO_fpe_encrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address);
+    int WBCRYPTO_fpe_encrypt_cn_utf8(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn);
 
-    int WBCRYPTO_fpe_decrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address);
+    int WBCRYPTO_fpe_decrypt_cn_utf8(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn);
 
-    int WBCRYPTO_fpe_encrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample);
+    int WBCRYPTO_fpe_encrypt_cn_utf8_with_sample(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn, char *sample);
 
-    int WBCRYPTO_fpe_decrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample);
+    int WBCRYPTO_fpe_decrypt_cn_utf8_with_sample(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn, char *sample);
 
 #ifdef __cplusplus
 }

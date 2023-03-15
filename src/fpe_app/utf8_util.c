@@ -1,4 +1,4 @@
-#include "cn_char.h"
+#include "utf8_util.h"
 
 uint32_t utf8CharToUint32(char *str) {
     uint32_t uc;

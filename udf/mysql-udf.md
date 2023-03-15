@@ -2,7 +2,7 @@
 
 ## ubuntu 安装 MySQL
 
-```
+```asm
 ## 安装mysql
 $ sudo apt-get update
 $ sudo apt-get install mysql-server
@@ -23,7 +23,7 @@ $ sudo mysql -u root -p
 > flush privileges;
 ```
 
-```
+```asm
 ## 卸载mysql
 $ sudo apt-get remove mysql*
 $ sudo apt-get purge mysql*
@@ -44,7 +44,7 @@ $ sudo apt-get autoclean
 
 ### 安装 MySQL 的接口库
 
-```
+```asm
 $ sudo apt-get update
 $ sudo apt-get install build-essential libmysqlclient-dev
 ```
@@ -128,7 +128,7 @@ EXPORT char *myreverse(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned 
 myreverse
 
 ### 编译库
-```
+```asm
 ## 编译库
 $  g++ -shared -fPIC -I /usr/include/mysql mysql.cpp -o udf.so
 
@@ -138,7 +138,7 @@ $ sudo mv udf.so /usr/lib/mysql/plugin/
 
 ### 执行数据库命令
 进行数据库执行命令
-```
+```asm
 ## 创建udf函数
 > CREATE FUNCTION myreverse RETURNS string SONAME 'udf.so';
 ## 注意：返回函数名、返回参数和库名需要写对

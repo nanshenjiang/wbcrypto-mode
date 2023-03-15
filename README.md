@@ -30,7 +30,7 @@
 请确保编译环境中含gcc和cmake环境，同时安装好openssl库。
 
 运行下面命令编译库：
-```
+```asm
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
@@ -39,13 +39,13 @@ $ make -j
 
 （可选）使用下面命令将头文件和编译库安装至系统全局环境中：
 
-```
+```asm
 $ sudo make install
 ```
 
 假设创建测试文件test.c调用环境变量中的wbcrypto编译库，请指定动态库搜索路径，例如ubuntu环境下：
 
-```
+```asm
 $ gcc test.c -o test -lwbcrypto -Wl,-rpath="/usr/local/lib"
 ```
 

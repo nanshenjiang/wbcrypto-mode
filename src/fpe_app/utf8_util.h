@@ -1,5 +1,5 @@
-#ifndef WBCRYPTO_FPE_CN_CHAR_H
-#define WBCRYPTO_FPE_CN_CHAR_H
+#ifndef WBCRYPTO_FPE_UTF8_UTIL_H
+#define WBCRYPTO_FPE_UTF8_UTIL_H
 
 #include <stdint.h>
 #include <ctype.h>
@@ -22,4 +22,4 @@ void utf8IntToCharDuodecimal(int dec, char result[]);
 
 int utf8CharDuodecimalToInt(const char duo[]);
 
-#endif //WBCRYPTO_FPE_CN_CHAR_H
+#endif //WBCRYPTO_FPE_UTF8_UTIL_H

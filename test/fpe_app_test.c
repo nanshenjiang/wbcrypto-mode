@@ -89,7 +89,7 @@ int test_fpe_address() {
     WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_SM4, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
     for (i = 0; i < TESTTIME; i++) {
-        WBCRYPTO_fpe_encrypt_address(&app_ctx, input, cipher);
+        WBCRYPTO_fpe_encrypt_cn_utf8(&app_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
@@ -97,12 +97,12 @@ int test_fpe_address() {
     printf("[FPE address] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
            1 / (ts / TESTTIME));
     printf("[FPE address] encrypt answer: %s\n", cipher);
-    WBCRYPTO_fpe_decrypt_address(&app_ctx, cipher, plain);
+    WBCRYPTO_fpe_decrypt_cn_utf8(&app_ctx, cipher, plain);
     printf("[FPE address] decrypt answer: %s\n", plain);
 
-    WBCRYPTO_fpe_encrypt_address_with_sample(&app_ctx, input, cipher, sample);
+    WBCRYPTO_fpe_encrypt_cn_utf8_with_sample(&app_ctx, input, cipher, sample);
     printf("[FPE address with sample] encrypt answer: %s\n", cipher);
-    WBCRYPTO_fpe_decrypt_address_with_sample(&app_ctx, cipher, plain, sample);
+    WBCRYPTO_fpe_decrypt_cn_utf8_with_sample(&app_ctx, cipher, plain, sample);
     printf("[FPE address with sample] decrypt answer: %s\n", plain);
 }
 

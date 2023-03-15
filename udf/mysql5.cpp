@@ -96,17 +96,11 @@ char *fpe(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,
         }else {
             WBCRYPTO_fpe_encrypt_idcard(&app_ctx, plain, initid->ptr);
         }
-    } else if (strcmp(mode, "address") == 0) {
+    } else if (strcmp(mode, "name") == 0 || strcmp(mode, "address") == 0) {
         if (args->arg_count == 3) {
-            WBCRYPTO_fpe_encrypt_address_with_sample(&app_ctx, plain, initid->ptr, sample);
+            WBCRYPTO_fpe_encrypt_cn_utf8_with_sample(&app_ctx, plain, initid->ptr, sample);
         }else {
-            WBCRYPTO_fpe_encrypt_address(&app_ctx, plain, initid->ptr);
-        }
-    } else if (strcmp(mode, "name") == 0) {
-        if (args->arg_count == 3) {
-            WBCRYPTO_fpe_encrypt_address_with_sample(&app_ctx, plain, initid->ptr, sample);
-        }else {
-            WBCRYPTO_fpe_encrypt_address(&app_ctx, plain, initid->ptr);
+            WBCRYPTO_fpe_encrypt_cn_utf8(&app_ctx, plain, initid->ptr);
         }
     } else {
         strcpy(error, "requires optional mode: phone or idcard or address");

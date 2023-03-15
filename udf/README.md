@@ -6,7 +6,7 @@
 
 #### 环境准备
 
-```
+```asm
 ## 安装mysql和mysql开发库
 $ sudo apt-get update && sudo apt upgrade
 $ sudo apt install mysql-server-5.7
@@ -14,7 +14,7 @@ $ sudo apt-get install build-essential libmysqlclient-dev
 ```
 
 #### 编译wbcrypto-fpe密码库
-```
+```asm
 ## 在目录wbcrypt-fpe/下编译库
 $ mkdir build && cd build
 $ cmake ..
@@ -24,7 +24,7 @@ $ sudo cp -f ./out/libwbcrypto.so /usr/lib/
 ```
 
 ### 构建
-```
+```asm
 ## 在当前目录udf/下编译库
 $ mkdir build && cd build
 $ cmake ..
@@ -32,10 +32,10 @@ $ make -j
 $ sudo make install
 ```
 MySQL8版本将其中cmake命令改为：
-```
+```asm
 $ cmake -DMYSQL8=1 ..
 ```
-```
+```asm
 ## 在当前目录udf/下编译库
 $ mkdir build && cd build
 $ cmake ..
@@ -43,7 +43,7 @@ $ make -j
 $ sudo make install
 ```
 输入mysql -uroot -p进行数据库操作界面：
-```
+```asm
 ## 创建udf函数
 > CREATE FUNCTION fpe RETURNS string SONAME 'udf.so';
 
@@ -55,7 +55,7 @@ $ sudo make install
 ```
 
 ### 使用
-```
+```asm
 ## mysql 5.x版本
 > SELECT fpe('13912345678','phone', '134xxxx5678');
 > SELECT fpe('441412345678901234','idcard', '4414xxxxxxxxxx1234');
@@ -71,7 +71,7 @@ $ sudo make install
 ### 测试
 
 #### 测试速度
-```
+```asm
 ## 查询10000条数据的耗时
 > SELECT *, UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 10000;
 
@@ -79,7 +79,7 @@ $ sudo make install
 > SELECT BENCHMARK(1000000, fpe('13912345678','phone', '134xxxx5678'));
 ```
 
-```
+```asm
 ## 例子
 > SELECT phone, UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 100000;
 > SELECT fpe(phone,'phone','123xxxx4567'), UNIX_TIMESTAMP() - @start_time AS elapsed_time FROM test LIMIT 100000;

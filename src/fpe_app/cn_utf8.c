@@ -4,11 +4,11 @@
 #include <wbcrypto/wbsm4.h>
 #include <string.h>
 #include <ctype.h>
-#include "cn_char.h"
+#include "utf8_util.h"
 
-int aux_fpe_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, char *after_address, fpe_block128_f block) {
+int aux_fpe_cn(WBCRYPTO_fpe_app_context *ctx, char *cn, char *sample, char *after_cn, fpe_block128_f block) {
     int ret = 0;
-    int len = strlen(address) / 3;
+    int len = strlen(cn) / 3;
     int i, tweak_len = 0;
 
     for (i = 0; i < strlen(sample); i++) {
@@ -24,7 +24,7 @@ int aux_fpe_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, 
     char ans[(len - tweak_len) * 4];
     char *input_p = input;
     char *tweak_p = tweak;
-    char *ch = address;
+    char *ch = cn;
     if (strcmp(sample, "") == 0) {
         for (i = 0; i < len; i++, ch += 3) {
             uint32_t uc = utf8CharToUint32(ch);
@@ -62,9 +62,9 @@ int aux_fpe_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *sample, 
     }
     (*block)(fpe_ctx, input, ans);
 
-    char *ori_add = address;
+    char *ori_add = cn;
     char *ans_p = ans;
-    char *af_p = after_address;
+    char *af_p = after_cn;
     if (strcmp(sample, "") == 0) {
         for (i = 0; i < len; i++, af_p += 3) {
             int uc_int = utf8CharDuodecimalToInt(ans_p);
@@ -93,15 +93,15 @@ cleanup:
     return ret;
 }
 
-int WBCRYPTO_fpe_encrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address) {
-    return WBCRYPTO_fpe_encrypt_address_with_sample(ctx, address, after_address, "");
+int WBCRYPTO_fpe_encrypt_cn_utf8(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn) {
+    return WBCRYPTO_fpe_encrypt_cn_utf8_with_sample(ctx, cn, after_cn, "");
 }
 
-int WBCRYPTO_fpe_decrypt_address(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address) {
-    return WBCRYPTO_fpe_decrypt_address_with_sample(ctx, address, after_address, "");
+int WBCRYPTO_fpe_decrypt_cn_utf8(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn) {
+    return WBCRYPTO_fpe_decrypt_cn_utf8_with_sample(ctx, cn, after_cn, "");
 }
 
-int WBCRYPTO_fpe_encrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample) {
+int WBCRYPTO_fpe_encrypt_cn_utf8_with_sample(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn, char *sample) {
     fpe_block128_f block;
     if (strcmp(ctx->ffx, WBCYRPTO_FPE_FFX_FF1) == 0) {
         block = (fpe_block128_f) WBCRYPTO_ff1_encrypt;
@@ -110,10 +110,10 @@ int WBCRYPTO_fpe_encrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char
     } else { // default: ff3-1
         block = (fpe_block128_f) WBCRYPTO_ff3_encrypt;
     }
-    return aux_fpe_address(ctx, address, sample, after_address, block);
+    return aux_fpe_cn(ctx, cn, sample, after_cn, block);
 }
 
-int WBCRYPTO_fpe_decrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char *address, char *after_address, char *sample) {
+int WBCRYPTO_fpe_decrypt_cn_utf8_with_sample(WBCRYPTO_fpe_app_context *ctx, char *cn, char *after_cn, char *sample) {
     fpe_block128_f block;
     if (strcmp(ctx->ffx, WBCYRPTO_FPE_FFX_FF1) == 0) {
         block = (fpe_block128_f) WBCRYPTO_ff1_decrypt;
@@ -122,5 +122,5 @@ int WBCRYPTO_fpe_decrypt_address_with_sample(WBCRYPTO_fpe_app_context *ctx, char
     } else { // default: ff3-1
         block = (fpe_block128_f) WBCRYPTO_ff3_decrypt;
     }
-    return aux_fpe_address(ctx, address, sample, after_address, block);
+    return aux_fpe_cn(ctx, cn, sample, after_cn, block);
 }
