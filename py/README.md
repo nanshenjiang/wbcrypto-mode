@@ -15,6 +15,8 @@ $ mysql -uroot -p
 $ pip install -r requirments_insert.txt
 $ python insert_mysql.py
 ```
+修改password为数据库密码
+
 修改num_inserts为指定生成数量
 
 ## 简单的透明代理
@@ -22,6 +24,7 @@ $ python insert_mysql.py
 $ pip install -r requirments_proxy.txt
 $ python trans_proxy.py
 ```
+修改password为数据库密码
 ### 测试
 ```asm
 ## 测试连通，获取到“hello”证明连通
