@@ -35,12 +35,7 @@ MySQL8版本将其中cmake命令改为：
 ```asm
 $ cmake -DMYSQL8=1 ..
 ```
-```asm
-## 在当前目录udf/下编译库
-$ mkdir build && cd build
-$ cmake ..
-$ make -j
-$ sudo make install
+如果报错找不到libmysqlclient路径，尝试将CMakelists.txt中/usr/lib改为/usr/lib64
 ```
 输入mysql -uroot -p进行数据库操作界面：
 ```asm

@@ -34,4 +34,37 @@ $ python trans_proxy.py
 $ curl http://localhost:5432/hello
 ## 测试获取数据库数据
 $ curl --data "sql=SELECT * FROM student limit 1" http://localhost:5432/admin/students
+$ curl --data "sql=SELECT * FROM student limit 1" http://localhost:5432/user/students
 ```
+
+### 运行在服务器
+```asm
+$ pip install gunicorn
+$ gunicorn trans_proxy:app -b 0.0.0.0:5432
+```
+在/etc/systemd/system目录下创建trans_proxy.service并编写：
+```asm
+[Unit]
+Description=Trans proxy
+After=network.target
+
+[Service]
+User=xie
+Group=xie
+WorkingDirectory=/home/wbcrypto-fpe/py/  ##改成指定目录
+ExecStart=/usr/local/bin/gunicorn trans_proxy:app -b 0.0.0.0:5432
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+```asm
+## 后台执行
+$ sudo systemctl start trans_proxy
+$ sudo systemctl enable trans_proxy
+
+## 检查状态
+$ sudo systemctl status trans_proxy
+```
+记得配置nginx反向代理！

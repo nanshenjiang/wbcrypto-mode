@@ -8,7 +8,7 @@ include_directories(/usr/include/mysql)
 include_directories(../include)
 
 link_directories(/usr/lib/mysql)
-
+#link_directories(/usr/lib64/mysql)
 link_directories(../build/out)
 
 option(MYSQL8 "using mysql8" OFF)
@@ -25,6 +25,7 @@ target_link_libraries(udf mysqlclient wbcrypto -lm)
 set_target_properties(udf PROPERTIES PREFIX "")
 
 install(TARGETS udf DESTINATION /usr/lib/mysql/plugin)
+#install(TARGETS udf DESTINATION /usr/lib64/mysql/plugin)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -Wl,-rpath=\"/usr/local/lib\" -O3")
 
