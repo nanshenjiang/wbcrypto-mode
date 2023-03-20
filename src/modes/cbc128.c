@@ -11,9 +11,7 @@ int WBCRYPTO_cbc128_encrypt(const unsigned char *in, size_t inlen,
         WBCRYPTO_THROW_REASON("WBCRYPTO_cbc128_encrypt",WBCRYPTO_INLEN_THAN_OUTLEN);
     }
     *use_olen = len;
-#ifdef IMPORT_OPENSSL
-    CRYPTO_cbc128_encrypt(afin, out, len, key, ivec, block);
-#else
+
     size_t n;
     const unsigned char *iv = ivec;
 
@@ -40,8 +38,6 @@ int WBCRYPTO_cbc128_encrypt(const unsigned char *in, size_t inlen,
         afin += 16;
         out += 16;
     }
-//    memcpy(ivec, iv, 16);
-#endif
     ret=1;
 cleanup:
     return ret;
@@ -57,9 +53,6 @@ int WBCRYPTO_cbc128_decrypt(const unsigned char *in, size_t inlen,
     }else{
         len=inlen;
     }
-#ifdef IMPORT_OPENSSL
-    CRYPTO_cbc128_decrypt(in, out, len, key, ivec, block);
-#else
     size_t n;
     union {
         size_t t[16 / sizeof(size_t)];
@@ -119,8 +112,6 @@ int WBCRYPTO_cbc128_decrypt(const unsigned char *in, size_t inlen,
         in += 16;
         out += 16;
     }
-#endif
-//    *use_olen = WBCRYPTO_padding_pkcs7_separate_length(in, inlen);
     ret=1;
 cleanup:
     return ret;

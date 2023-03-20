@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9.0)
 
-project(wbcrypto-fpe)
+project(wbcrypto-mode)
 
 # option for opening openssl 
 option(IMPORT_OPENSSL "option for import openssl dependency" OFF)
@@ -34,9 +34,10 @@ aux_source_directory(src/utils wbcrypto_src)
 aux_source_directory(src/fpe wbcrypto_src)
 
 aux_source_directory(src/sm3 wbcrypto_src)
+aux_source_directory(src/aes wbcrypto_src)
+aux_source_directory(src/wbaes wbcrypto_src)
 aux_source_directory(src/sm4 wbcrypto_src)
 aux_source_directory(src/wbsm4 wbcrypto_src)
-aux_source_directory(src/aes wbcrypto_src)
 aux_source_directory(src/fpe_app wbcrypto_src)
 
 # static library
@@ -44,7 +45,7 @@ add_library(wbcrypto-static ${wbcrypto_src})
 SET_TARGET_PROPERTIES(wbcrypto-static PROPERTIES OUTPUT_NAME "wbcrypto")
 
 # dynamic library
-add_library(wbcrypto SHARED ${wbcrypto_src} src/fpe_app/utf8_util.h src/fpe_app/utf8_util.c)
+add_library(wbcrypto SHARED ${wbcrypto_src} src/fpe_app/utf8_util.h src/fpe_app/utf8_util.c include/wbcrypto/wbaes.h src/wbaes/wbaes_local.h src/wbaes/wbaes_modes.c)
 
 # install the header and library files to the environment
 install(DIRECTORY ${WBCRYPTO_INCLUDE_DIR}/ ${WBMATRIX_INCLUDE_DIR}/ DESTINATION include)

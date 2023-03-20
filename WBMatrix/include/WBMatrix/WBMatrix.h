@@ -262,6 +262,13 @@ void MatrixcomM16to128(M16 m1, M16 m2, M16 m3, M16 m4, M16 m5, M16 m6, M16 m7, M
 void VectorcomV16to128(V16 v1, V16 v2, V16 v3, V16 v4, V16 v5, V16 v6, V16 v7, V16 v8, V128 *vec);
 void affinecomM16to128(Aff16 aff1, Aff16 aff2, Aff16 aff3, Aff16 aff4, Aff16 aff5, Aff16 aff6, Aff16 aff7, Aff16 aff8, Aff128 *aff);
 
+/**
+ * other
+ */
+void genPermutation4(uint8_t *permutation, uint8_t *inverse);
+void genPermutation8(uint8_t *permutation, uint8_t *inverse);
+void MatrixcomM4to8(M4 m1, M4 m2, M8 *mat);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,6 +1,5 @@
 #include <wbcrypto/modes.h>
 
-#ifndef IMPORT_OPENSSL
 static const uint64_t last4[16] = {
         0x0000, 0x1c20, 0x3840, 0x2460, 0x7080, 0x6ca0, 0x48c0, 0x54e0,
         0xe100, 0xfd20, 0xd940, 0xc560, 0x9180, 0x8da0, 0xa9c0, 0xb5e0  };
@@ -54,14 +53,10 @@ static void gcm_mult( WBCRYPTO_gcm_context *ctx,
     PUT_UINT32_BE( zl >> 32, output, 8 );
     PUT_UINT32_BE( zl, output, 12 );
 }
-#endif
 
 WBCRYPTO_gcm_context *WBCRYPTO_gcm_init(void *key, block128_f block)
 {
     struct gcm128_context *ctx;
-#ifdef IMPORT_OPENSSL
-    ctx=CRYPTO_gcm128_new(key,block);
-#else
     int i, j;
     uint64_t hi, lo;
     uint64_t vl, vh;
@@ -110,7 +105,6 @@ WBCRYPTO_gcm_context *WBCRYPTO_gcm_init(void *key, block128_f block)
             HiL[j] = vl ^ ctx->HL[j];
         }
     }
-#endif
     return ctx;
 cleanup:
     return NULL;
@@ -119,9 +113,6 @@ cleanup:
 int WBCRYPTO_gcm_setiv(WBCRYPTO_gcm_context *ctx,
                           const unsigned char *iv, size_t len){
     int ret=0;            // our error return if the AES encrypt fails
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_setiv(ctx, iv, len);
-#else
     unsigned char work_buf[16]; // XOR source built from provided IV if len != 16
     const unsigned char *p;     // general purpose array pointer
     size_t use_len;     // byte count to process, up to 16 bytes
@@ -156,7 +147,6 @@ int WBCRYPTO_gcm_setiv(WBCRYPTO_gcm_context *ctx,
         gcm_mult( ctx, ctx->y, ctx->y );
     }
     WBCRYPTO_MPI_CHK((*block) (ctx->y, ctx->base_ectr, key));
-#endif
     ret=1;
 cleanup:
     return ret;
@@ -165,9 +155,6 @@ cleanup:
 int WBCRYPTO_gcm_aad(WBCRYPTO_gcm_context *ctx,
                         const unsigned char *aad, size_t len){
     int ret=0;            // our error return if the AES encrypt fails
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_aad(ctx, aad ,len);
-#else
     const unsigned char *p;     // general purpose array pointer
     size_t use_len;     // byte count to process, up to 16 bytes
     size_t i;           // local loop iterator
@@ -183,71 +170,10 @@ int WBCRYPTO_gcm_aad(WBCRYPTO_gcm_context *ctx,
         len -= use_len;
         p += use_len;
     }
-#endif
     ret=1;
 cleanup:
     return ret;
 }
-
-//int WBCRYPTO_gcm_setiv_and_aad(WBCRYPTO_gcm_context *ctx,
-//                                  const unsigned char *iv, size_t ivlen,
-//                                  const unsigned char *aad, size_t aadlen){
-//    int ret=0;            // our error return if the AES encrypt fails
-//#ifdef IMPORT_OPENSSL
-//    CRYPTO_gcm128_setiv(ctx, iv, ivlen);
-//    CRYPTO_gcm128_aad(ctx, aad ,aadlen);
-//#else
-//    unsigned char work_buf[16]; // XOR source built from provided IV if len != 16
-//    const unsigned char *p;     // general purpose array pointer
-//    size_t use_len;     // byte count to process, up to 16 bytes
-//    size_t i;           // local loop iterator
-//    block128_f block = ctx->block;
-//    void *key = ctx->key;
-//
-//    // since the context might be reused under the same key
-//    // we zero the working buffers for this next new process
-//    memset( ctx->y,   0x00, sizeof(ctx->y  ) );
-//    memset( ctx->buf, 0x00, sizeof(ctx->buf) );
-//    ctx->len = 0;
-//    ctx->add_len = 0;
-//
-//    if( ivlen == 12 ) {                // GCM natively uses a 12-byte, 96-bit IV
-//        memcpy( ctx->y, iv, ivlen );   // copy the IV to the top of the 'y' buff
-//        ctx->y[15] = 1;                 // start "counting" from 1 (not 0)
-//    }
-//    else    // if we don't have a 12-byte IV, we GHASH whatever we've been given
-//    {
-//        memset( work_buf, 0x00, 16 );               // clear the working buffer
-//        PUT_UINT32_BE( ivlen * 8, work_buf, 12 );  // place the IV into buffer
-//
-//        p = iv;
-//        while( ivlen > 0 ) {
-//            use_len = ( ivlen < 16 ) ? ivlen : 16;
-//            for( i = 0; i < use_len; i++ ) ctx->y[i] ^= p[i];
-//            gcm_mult( ctx, ctx->y, ctx->y );
-//            ivlen -= use_len;
-//            p += use_len;
-//        }
-//        for( i = 0; i < 16; i++ ) ctx->y[i] ^= work_buf[i];
-//        gcm_mult( ctx, ctx->y, ctx->y );
-//    }
-//
-//    WBCRYPTO_MPI_CHK((*block) (ctx->y, ctx->base_ectr, key));
-//
-//    ctx->add_len = aadlen;
-//    p = aad;
-//    while( aadlen > 0 ) {
-//        use_len = ( aadlen < 16 ) ? aadlen : 16;
-//        for( i = 0; i < use_len; i++ ) ctx->buf[i] ^= p[i];
-//        gcm_mult( ctx, ctx->buf, ctx->buf );
-//        aadlen -= use_len;
-//        p += use_len;
-//    }
-//#endif
-//    ret=1;
-//    cleanup:
-//    return ret;
-//}
 
 int WBCRYPTO_gcm_encrypt(WBCRYPTO_gcm_context *ctx,
                             const unsigned char *in, size_t inlen,
@@ -258,9 +184,6 @@ int WBCRYPTO_gcm_encrypt(WBCRYPTO_gcm_context *ctx,
     }else{
         len=inlen;
     }
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_encrypt(ctx, in, out, len);
-#else
     unsigned char ectr[16];     // counter-mode cipher output for XORing
     size_t use_len;     // byte count to process, up to 16 bytes
     size_t i;           // local loop iterator
@@ -296,7 +219,6 @@ int WBCRYPTO_gcm_encrypt(WBCRYPTO_gcm_context *ctx,
         in  += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-#endif
     ret=1;
 cleanup:
     return ret;
@@ -311,9 +233,6 @@ int WBCRYPTO_gcm_decrypt(WBCRYPTO_gcm_context *ctx,
     }else{
         len=inlen;
     }
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_decrypt(ctx, in, out, len);
-#else
     unsigned char ectr[16];     // counter-mode cipher output for XORing
     size_t use_len;     // byte count to process, up to 16 bytes
     size_t i;           // local loop iterator
@@ -350,7 +269,6 @@ int WBCRYPTO_gcm_decrypt(WBCRYPTO_gcm_context *ctx,
         in  += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-#endif
     ret=1;
 cleanup:
     return ret;
@@ -359,9 +277,6 @@ cleanup:
 int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx, unsigned char *tag,
                             size_t len){
     int ret=0;
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_finish(ctx, tag , len);
-#else
     unsigned char work_buf[16];
     uint64_t orig_len     = ctx->len * 8;
     uint64_t orig_add_len = ctx->add_len * 8;
@@ -381,16 +296,11 @@ int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx, unsigned char *tag,
         gcm_mult( ctx, ctx->buf, ctx->buf );
         for( i = 0; i < len; i++ ) tag[i] ^= ctx->buf[i];
     }
-#endif
     ret=1;
 cleanup:
     return ret;
 }
 
 void WBCRYPTO_gcm_free(WBCRYPTO_gcm_context *ctx){
-#ifdef IMPORT_OPENSSL
-    CRYPTO_gcm128_release(ctx);
-#else
     memset( ctx, 0, sizeof(WBCRYPTO_gcm_context) );
-#endif
 }

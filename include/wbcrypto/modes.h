@@ -9,14 +9,10 @@
 #include <wbcrypto/error.h>
 #include <wbcrypto/utils.h>
 
-
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-#ifdef IMPORT_OPENSSL
-    #include <openssl/modes.h>
-#else
     typedef int (*block128_f) (const unsigned char in[16], unsigned char out[16],
                                const void *key);
 
@@ -31,7 +27,7 @@ extern "C" {
         void *key;                      // cipher context used
         block128_f block;               // encryption algorithm
     };
-#endif
+
     /******************************************************************
     * CBC mode
     *****************************************************************/

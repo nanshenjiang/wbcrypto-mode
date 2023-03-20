@@ -1,6 +1,6 @@
-# FPE密码库
+# 白盒分组密码工作模式库
 
-本密码算法库提供FPE（FF1和FF3-1）的加解密接口。中国手机号、身份证号和中文字符（姓名和地址）的加解密接口。
+本密码库提供Chow的白盒AES实现，肖来的白盒SM4实现，以及多种工作模式，包括：CBC、GCM、并行GCM、WBGCM-EE、WBGCM-Masking、FPE，以及应用类接口：手机号、中国身份证号和中文地址的FPE接口。
 
 ## 概述
 
@@ -8,20 +8,21 @@
 
 - sm3
 - aes
+- wbaes - Chow的白盒AES
 - sm4
-- wbsm4 - 白盒SM4
+- wbsm4 - 肖来的白盒SM4
 
 #### 目前支持加密模式
 
 - CBC模式
 - GCM模式
+- 并行GCM模式
+- 白盒GCM模式 - WBGCM-EE和WBGCM-Masking
 - gcmfile模式 - 基于GCM模式加解密文件模式
 - FPE模式 - FF1和FF3加密格式
 
 #### 其他能力
 - 支持手机号、身份证号、姓名、地址的FPE加密
-
-
 
 ## 构建 && 安装
 

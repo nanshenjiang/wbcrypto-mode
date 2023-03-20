@@ -38,3 +38,9 @@ WBCRYPTO_gcmfile_context *WBCRYPTO_wbsm4_gcmfile_init(WBCRYPTO_wbsm4_context *ke
     WBCRYPTO_gcmfile_context *ctx=WBCRYPTO_gcmfile_init(key,(block128_f) WBCRYPTO_wbsm4_encrypt);
     return ctx;
 }
+
+WBCRYPTO_fpe_context *WBCRYPTO_wbsm4_fpe_init(WBCRYPTO_wbsm4_context *key, const char *twkbuf, size_t twklen, unsigned int radix)
+{
+    WBCRYPTO_fpe_context *ctx = WBCRYPTO_fpe_init(twkbuf, twklen, radix, key, (block128_f)WBCRYPTO_wbsm4_encrypt);
+    return ctx;
+}

@@ -53,6 +53,55 @@ extern "C" {
     */
     void WBCRYPTO_aes_context_free(WBCRYPTO_aes_context *ctx);
 
+    /********************************************CBC mode************************************************/
+    /**
+    * aes encryption of cbc mode
+    * @param in plaintext
+    * @param inlen the length of input
+    * @param out ciphertext
+    * @param max_olen the longest storage space of ciphertext
+    * @param use_olen the specific using space length of ciphertext
+    * @param ctx aes-ctx must be init
+    * @param ivec initialization-vectors, the length must be 16
+    * @return 1 if success, 0 if error
+    */
+    int WBCRYPTO_aes_cbc_encrypt(const unsigned char *in, size_t inlen,
+                                 unsigned char *out, size_t max_olen, size_t *use_olen,
+                                 const WBCRYPTO_aes_context *ctx,
+                                 unsigned char ivec[16]);
+
+    /**
+    * aes decryption of cbc mode
+    * @param in ciphertext
+    * @param inlen the length of input
+    * @param out plaintext
+    * @param max_olen the longest storage space of plaintext
+    * @param use_olen the specific using space length of plaintext
+    * @param ctx aes-ctx must be init
+    * @param ivec initialization-vectors, the length must be 16
+    * @return 1 if success, 0 if error
+    */
+    int WBCRYPTO_aes_cbc_decrypt(const unsigned char *in, size_t inlen,
+                                 unsigned char *out, size_t max_olen, size_t *use_olen,
+                                 const WBCRYPTO_aes_context *ctx,
+                                 unsigned char ivec[16]);
+
+    /********************************************GCM mode************************************************/
+    /**
+    * init the gcm128 context
+    * @param key the context of aes-algorithm, must be init
+    * @return NULL is fault, otherwise successful
+    */
+    WBCRYPTO_gcm_context *WBCRYPTO_aes_gcm_init(WBCRYPTO_aes_context *key);
+
+    /******************************************gcmfile mode*********************************************/
+    /**
+    * init the gcm-file context
+    * @param key the context of aes-algorithm, must be init
+    * @return NULL is fault, otherwise successful
+    */
+    WBCRYPTO_gcmfile_context *WBCRYPTO_aes_gcmfile_init(WBCRYPTO_aes_context *key);
+
     /******************************************fpe-ff1 mode*********************************************/
     /**
     * Create a context instance for use with the FF1 algorithm
