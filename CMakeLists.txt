@@ -3,14 +3,7 @@ cmake_minimum_required(VERSION 3.9.0)
 project(wbcrypto-mode)
 
 # option for opening openssl 
-option(IMPORT_OPENSSL "option for import openssl dependency" OFF)
-set(IMPORT_OPENSSL ON)
-if (IMPORT_OPENSSL)
-    message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is imported into the environment")
-	add_definitions(-DIMPORT_OPENSSL)
-else()
-    message("Note: Import_OPENSSL option is OFF by default")
-endif()
+message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is imported into the environment")
 
 #open test
 option(UNIT_TEST "test" ON)

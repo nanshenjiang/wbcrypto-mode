@@ -26,9 +26,11 @@
 
 ## 构建 && 安装
 
-### 快速开始
+### 预先
 
-请确保编译环境中含gcc和cmake环境，同时安装好openssl库。
+**请确保编译环境中含gcc和cmake环境，同时安装好openssl库**。
+
+### 快速开始
 
 运行下面命令编译库：
 ```asm
@@ -51,13 +53,8 @@ $ gcc test.c -o test -lwbcrypto -Wl,-rpath="/usr/local/lib"
 ```
 
 
-
 ## 额外能力
 
 ### MySQL的UDF函数
 
 在当面目录下的/udf下
-
-### 伪透明代理服务
-
-在当面目录下的/py下

@@ -12,20 +12,9 @@ static const unsigned char expect_cipher[16] = {0x68, 0x1e, 0xdf, 0x34, 0xd2, 0x
 
 int test_wbsm4() {
     int ret = 0;
-    int i;
-    unsigned char iv[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
-                            0x0f};
-    unsigned char aad[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
-                             0x0f};
     unsigned char msg1024[1024] = {0};
     unsigned char cipher[16] = {0};
     unsigned char plain[16] = {0};
-    unsigned char cipher1024[1024] = {0};
-    unsigned char plain1024[1024] = {0};
-    size_t use_len;
-    for (i = 0; i < 1024; i++) {
-        msg1024[i] = i & 0xff;
-    }
 
     WBCRYPTO_wbsm4_context *wbsm4_ctx_enc, *wbsm4_ctx_dec;
     wbsm4_ctx_enc = WBCRYPTO_wbsm4_context_init(WBCRYPTO_ENCRYPT_MODE, 1);

@@ -12,11 +12,8 @@ static const unsigned char expect_cipher[16]={0x68, 0x1e, 0xdf, 0x34, 0xd2, 0x06
 
 int test_sm4(){
     int ret=0;
-    int i;
     unsigned char cipher[16] = {0};
     unsigned char plain[16] = {0};
-    unsigned char plain1024[1024] = {0};
-    size_t use_len;
 
     WBCRYPTO_sm4_context *sm4_ctx;
     sm4_ctx=WBCRYPTO_sm4_context_init();
