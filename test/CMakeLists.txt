@@ -1,7 +1,7 @@
 message(STATUS "${PROJECT_NAME} TEST ON")
 
 set(TEST_BUILD_NAME aes_test)
-add_executable(${TEST_BUILD_NAME} aes_test.c test_utils.c)
+add_executable(${TEST_BUILD_NAME} aes_test.c test_utils.c perform_wbaes_test.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
 
 set(TEST_BUILD_NAME wbaes_test)
@@ -27,3 +27,11 @@ TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
 set(TEST_BUILD_NAME fpe_app_test)
 add_executable(${TEST_BUILD_NAME} fpe_app_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
+
+set(TEST_BUILD_NAME perform_wbaes_test)
+add_executable(${TEST_BUILD_NAME} perform_wbaes_test.c test_utils.c)
+if(OpenMP_CXX_FOUND)
+    TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} PUBLIC OpenMP::OpenMP_CXX wbcrypto -lssl -lcrypto -lm)
+else()
+    TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
+endif()

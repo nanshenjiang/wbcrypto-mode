@@ -143,6 +143,36 @@ extern "C" {
      */
     void WBCRYPTO_gcm_free(WBCRYPTO_gcm_context *ctx);
 
+    void gcm_mult( WBCRYPTO_gcm_context *ctx, const unsigned char x[16], unsigned char output[16] );
+    /******************************************************************
+    * Encrypt/Decrypt parallel in GCM mode
+    ******************************************************************/
+    /**
+    * encryption of gcm mode by parallel
+    * @param ctx the context of gcm-mode
+    * @param in plaintext
+    * @param inlen size of plaintext
+    * @param out ciphertext
+    * @param outlen size of ciphertext
+    * @return 1 if success, 0 if error
+    */
+    int WBCRYPTO_gcm_parallel_encrypt(WBCRYPTO_gcm_context *ctx,
+                                     const unsigned char *in, size_t inlen,
+                                     unsigned char *out, size_t outlen);
+
+    /**
+    * decryption of gcm mode by parallel
+    * @param ctx the context of gcm-mode
+    * @param in ciphertext
+    * @param inlen size of ciphertext
+    * @param out plaintext
+    * @param outlen size of plaintext
+    * @return 1 if success, 0 if error
+    */
+    int WBCRYPTO_gcm_parallel_decrypt(WBCRYPTO_gcm_context *ctx,
+                                     const unsigned char *in, size_t inlen,
+                                     unsigned char *out, size_t outlen);
+
     /******************************************************************
     * Encrypt/Decrypt files in GCM mode
     ******************************************************************/

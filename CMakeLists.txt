@@ -9,6 +9,9 @@ message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is 
 option(UNIT_TEST "test" ON)
 set(UNIT_TEST "test" ON)
 
+#include openmp
+find_package(OpenMP)
+
 # global import header file
 set(WBCRYPTO_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(WBMATRIX_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/WBMatrix/include)
@@ -38,7 +41,7 @@ add_library(wbcrypto-static ${wbcrypto_src})
 SET_TARGET_PROPERTIES(wbcrypto-static PROPERTIES OUTPUT_NAME "wbcrypto")
 
 # dynamic library
-add_library(wbcrypto SHARED ${wbcrypto_src} src/fpe_app/utf8_util.h src/fpe_app/utf8_util.c include/wbcrypto/wbaes.h src/wbaes/wbaes_local.h src/wbaes/wbaes_modes.c)
+add_library(wbcrypto SHARED ${wbcrypto_src})
 
 # install the header and library files to the environment
 install(DIRECTORY ${WBCRYPTO_INCLUDE_DIR}/ ${WBMATRIX_INCLUDE_DIR}/ DESTINATION include)
@@ -54,5 +57,5 @@ ELSE(UNIT_TEST)
     message(STATUS "${PROJECT_NAME} TEST OFF")
 ENDIF(UNIT_TEST)
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O2 -fopenmp")
 

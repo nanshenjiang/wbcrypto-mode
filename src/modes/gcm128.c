@@ -16,7 +16,7 @@ static const uint64_t last4[16] = {
     (b)[(i) + 2] = (unsigned char) ( (n) >>  8 );   \
     (b)[(i) + 3] = (unsigned char) ( (n)       ); }
 
-static void gcm_mult( WBCRYPTO_gcm_context *ctx,
+void gcm_mult( WBCRYPTO_gcm_context *ctx,
                       const unsigned char x[16],
                       unsigned char output[16] )
 {
