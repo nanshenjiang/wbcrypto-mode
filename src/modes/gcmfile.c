@@ -19,7 +19,7 @@ int WBCRYPTO_gcmfile_setiv(WBCRYPTO_gcmfile_context *ctx,
             WBCRYPTO_gcm_setiv(ctx->gcm, iv, len)
     );
     ret=1;
-    cleanup:
+cleanup:
     return ret;
 }
 
@@ -30,7 +30,7 @@ int WBCRYPTO_gcmfile_aad(WBCRYPTO_gcmfile_context *ctx,
             WBCRYPTO_gcm_aad(ctx->gcm, aad, len)
     );
     ret=1;
-    cleanup:
+cleanup:
     return ret;
 }
 

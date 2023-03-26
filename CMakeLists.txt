@@ -2,14 +2,15 @@ cmake_minimum_required(VERSION 3.9.0)
 
 project(wbcrypto-mode)
 
-# option for opening openssl 
-message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is imported into the environment")
-
 #open test
 option(UNIT_TEST "test" ON)
 set(UNIT_TEST "test" ON)
 
-#include openmp
+# warning for include openssl
+#message(WARNING "Note: Import_OPENSSL option is ON. Please make sure openssl is imported into the environment")
+
+#include openssl, openmp
+find_package(OpenSSL)
 find_package(OpenMP)
 
 # global import header file
@@ -46,16 +47,16 @@ add_library(wbcrypto SHARED ${wbcrypto_src})
 # install the header and library files to the environment
 install(DIRECTORY ${WBCRYPTO_INCLUDE_DIR}/ ${WBMATRIX_INCLUDE_DIR}/ DESTINATION include)
 install(TARGETS wbcrypto wbcrypto-static
-        LIBRARY DESTINATION lib  
-        ARCHIVE DESTINATION lib  
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
         )
 
 # test
-IF(UNIT_TEST)
+IF (UNIT_TEST)
     ADD_SUBDIRECTORY(test)
-ELSE(UNIT_TEST)
+ELSE (UNIT_TEST)
     message(STATUS "${PROJECT_NAME} TEST OFF")
-ENDIF(UNIT_TEST)
+ENDIF (UNIT_TEST)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O2 -fopenmp")
 

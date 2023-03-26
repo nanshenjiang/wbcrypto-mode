@@ -1,7 +1,4 @@
 #include <wbcrypto/fpe_app.h>
-#include <wbcrypto/aes.h>
-#include <wbcrypto/sm4.h>
-#include <wbcrypto/wbsm4.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -37,6 +34,8 @@ int aux_fpe_phone(WBCRYPTO_fpe_app_context *ctx, char *phone, char *sample, char
         fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_AES) == 0) {
         fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
+    } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_WBAES) == 0) {
+        fpe_ctx = WBCRYPTO_wbaes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     } else { //default:aes
         fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 10);
     }

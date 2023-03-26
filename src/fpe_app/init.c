@@ -1,7 +1,4 @@
 #include <wbcrypto/fpe_app.h>
-#include <wbcrypto/aes.h>
-#include <wbcrypto/sm4.h>
-#include <wbcrypto/wbsm4.h>
 #include <string.h>
 
 int WBCRYPTO_fpe_app_init(WBCRYPTO_fpe_app_context *ctx, const uint8_t *key, size_t keylen, char *cipher, char *ffx) {
@@ -23,6 +20,10 @@ int WBCRYPTO_fpe_app_init(WBCRYPTO_fpe_app_context *ctx, const uint8_t *key, siz
         WBCRYPTO_aes_context *aes_ctx = WBCRYPTO_aes_context_init();
         WBCRYPTO_aes_init_key(aes_ctx, input_key, sizeof(input_key));
         ctx->cipher_ctx = aes_ctx;
+    } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_WBAES) == 0) {
+        WBCRYPTO_wbaes_context *wbaes_ctx = WBCRYPTO_wbaes_context_init();
+        WBCRYPTO_wbaes_gen_table(wbaes_ctx, input_key, sizeof(input_key));
+        ctx->cipher_ctx = wbaes_ctx;
     } else {
         // default: aes
         WBCRYPTO_aes_context *aes_ctx = WBCRYPTO_aes_context_init();

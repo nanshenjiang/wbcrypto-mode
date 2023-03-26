@@ -2,8 +2,14 @@
 #define WBCRYPTO_FPE_APP_H
 
 #include <wbcrypto/fpe.h>
+#include <wbcrypto/aes.h>
+#include <wbcrypto/wbaes.h>
+#include <wbcrypto/sm4.h>
+#include <wbcrypto/wbsm4.h>
+
 
 #define WBCYRPTO_FPE_CIPHER_AES "aes"
+#define WBCYRPTO_FPE_CIPHER_WBAES "wbaes"
 #define WBCYRPTO_FPE_CIPHER_SM4 "sm4"
 #define WBCYRPTO_FPE_CIPHER_WBSM4 "wbsm4"
 

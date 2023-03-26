@@ -18,7 +18,7 @@ int test_fpe_phone() {
     double ts;
 
     WBCRYPTO_fpe_app_context app_ctx;
-    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_SM4, WBCYRPTO_FPE_FFX_FF1);
+    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
     for (i = 0; i < TESTTIME; i++) {
         WBCRYPTO_fpe_encrypt_phone(&app_ctx, input, cipher);
@@ -52,7 +52,7 @@ int test_fpe_idcard() {
     double ts;
 
     WBCRYPTO_fpe_app_context app_ctx;
-    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_SM4, WBCYRPTO_FPE_FFX_FF1);
+    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
     for (i = 0; i < TESTTIME; i++) {
         WBCRYPTO_fpe_encrypt_idcard(&app_ctx, input, cipher);
@@ -86,7 +86,7 @@ int test_fpe_address() {
     double ts;
 
     WBCRYPTO_fpe_app_context app_ctx;
-    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_SM4, WBCYRPTO_FPE_FFX_FF1);
+    WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
     for (i = 0; i < TESTTIME; i++) {
         WBCRYPTO_fpe_encrypt_cn_utf8(&app_ctx, input, cipher);

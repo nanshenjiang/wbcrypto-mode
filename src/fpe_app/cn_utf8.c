@@ -57,6 +57,8 @@ int aux_fpe_cn(WBCRYPTO_fpe_app_context *ctx, char *cn, char *sample, char *afte
         fpe_ctx = WBCRYPTO_wbsm4_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 12);
     } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_AES) == 0) {
         fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 12);
+    } else if (strcmp(ctx->cipher, WBCYRPTO_FPE_CIPHER_WBAES) == 0) {
+        fpe_ctx = WBCRYPTO_wbaes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 12);
     } else { // default: aes
         fpe_ctx = WBCRYPTO_aes_fpe_init(ctx->cipher_ctx, tweak, sizeof(tweak), 12);
     }
