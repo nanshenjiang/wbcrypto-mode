@@ -10,7 +10,7 @@ int WBCRYPTO_aes_cbc_encrypt(const unsigned char *in, size_t inlen,
                                     (block128_f) WBCRYPTO_aes_encrypt)
     );
     ret=1;
-    cleanup:
+cleanup:
     return ret;
 }
 

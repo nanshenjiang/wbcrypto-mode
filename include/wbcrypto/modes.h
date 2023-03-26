@@ -9,6 +9,22 @@
 #include <wbcrypto/error.h>
 #include <wbcrypto/utils.h>
 
+static const uint64_t last4[16] = {
+        0x0000, 0x1c20, 0x3840, 0x2460, 0x7080, 0x6ca0, 0x48c0, 0x54e0,
+        0xe100, 0xfd20, 0xd940, 0xc560, 0x9180, 0x8da0, 0xa9c0, 0xb5e0  };
+
+#define GET_UINT32_BE(n,b,i) {                      \
+    (n) = ( (uint32_t) (b)[(i)    ] << 24 )         \
+        | ( (uint32_t) (b)[(i) + 1] << 16 )         \
+        | ( (uint32_t) (b)[(i) + 2] <<  8 )         \
+        | ( (uint32_t) (b)[(i) + 3]       ); }
+
+#define PUT_UINT32_BE(n,b,i) {                      \
+    (b)[(i)    ] = (unsigned char) ( (n) >> 24 );   \
+    (b)[(i) + 1] = (unsigned char) ( (n) >> 16 );   \
+    (b)[(i) + 2] = (unsigned char) ( (n) >>  8 );   \
+    (b)[(i) + 3] = (unsigned char) ( (n)       ); }
+
 #ifdef  __cplusplus
 extern "C" {
 #endif

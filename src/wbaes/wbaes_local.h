@@ -28,4 +28,10 @@ static const uint8_t rCon[11] = {
         0x20, 0x40, 0x80, 0x1b, 0x36
 };
 
+void shiftRows(uint8_t state[16]);
+
+uint8_t gMul(uint8_t a, uint8_t b);
+
+void expandKey(const uint8_t key[16], uint8_t expandedKey[176]);
+
 #endif //WBCRYPTO_WBAES_LOCAL_H
