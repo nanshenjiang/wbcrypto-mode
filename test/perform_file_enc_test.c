@@ -248,22 +248,22 @@ int test_wbaes_wbgcmfile_ee() {
         char *tmp_dec = "../../testData/test.dec.txt";
         program_start = clock();
         for (j = 0; j < TEST_CYCLE_NUM; j++) {
-            WBCRYPTO_wbaes_wbgcmfile_ee_encrypt(wbgcm_enc, WBCRYPTO_TEST_FIN_PATH, WBCRYPTO_TEST_FENC_PATH);
+            WBCRYPTO_wbaes_wbgcmfile_ee_encrypt(wbgcm_enc, testFilePath[i], tmp_enc);
 
         }
         program_end = clock();
         ts = program_end - program_start;
         ts = ts / CLOCKS_PER_SEC;
-        printf("WBSM4-EE encrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
+        printf("WBAES-EE encrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
 
         program_start = clock();
         for (j = 0; j < TEST_CYCLE_NUM; j++) {
-            WBCRYPTO_wbaes_wbgcmfile_ee_decrypt(wbgcm_dec, WBCRYPTO_TEST_FENC_PATH, WBCRYPTO_TEST_FDEC_PATH);
+            WBCRYPTO_wbaes_wbgcmfile_ee_decrypt(wbgcm_dec, tmp_enc, tmp_dec);
         }
         program_end = clock();
         ts = program_end - program_start;
         ts = ts / CLOCKS_PER_SEC;
-        printf("WBSM4-EE decrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
+        printf("WBAES-EE decrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
         remove(tmp_enc);
         remove(tmp_dec);
     }
@@ -300,22 +300,22 @@ int test_wbaes_wbgcmfile_mask() {
         char *tmp_dec = "../../testData/test.dec.txt";
         program_start = clock();
         for (j = 0; j < TEST_CYCLE_NUM; j++) {
-            WBCRYPTO_wbaes_wbgcmfile_mask_encrypt(wbgcm_enc, WBCRYPTO_TEST_FIN_PATH, WBCRYPTO_TEST_FENC_PATH);
+            WBCRYPTO_wbaes_wbgcmfile_mask_encrypt(wbgcm_enc, testFilePath[i], tmp_enc);
 
         }
         program_end = clock();
         ts = program_end - program_start;
         ts = ts / CLOCKS_PER_SEC;
-        printf("WBSM4-Mask encrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
+        printf("WBAES-Masking encrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
 
         program_start = clock();
         for (j = 0; j < TEST_CYCLE_NUM; j++) {
-            WBCRYPTO_wbaes_wbgcmfile_mask_decrypt(wbgcm_dec, WBCRYPTO_TEST_FENC_PATH, WBCRYPTO_TEST_FDEC_PATH);
+            WBCRYPTO_wbaes_wbgcmfile_mask_decrypt(wbgcm_dec, tmp_enc, tmp_dec);
         }
         program_end = clock();
         ts = program_end - program_start;
         ts = ts / CLOCKS_PER_SEC;
-        printf("WBSM4-Mask decrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
+        printf("WBAES-Masking decrypt %d KB txt spend: %lf s\n", power(10, i), ts / TEST_CYCLE_NUM);
         remove(tmp_enc);
         remove(tmp_dec);
     }
