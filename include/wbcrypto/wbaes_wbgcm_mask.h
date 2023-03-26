@@ -37,7 +37,6 @@ extern "C" {
     void aux_WBCRYPTO_wbaes_wbgcm_mask_encrypt(const uint8_t *input, uint8_t *output, WBCRYPTO_wbaes_wbgcm_mask_context *ctx);
 
     /**********************Whibox-GCM-Masking Modes******************************/
-
     struct wbgcm_mask_context {
         uint64_t len;                   // cipher data length processed so far
         uint64_t add_len;               // total add data length
@@ -69,6 +68,13 @@ extern "C" {
     int WBCRYPTO_wbaes_wbgcm_mask_finish(WBCRYPTO_wbgcm_mask_context *ctx, unsigned char *tag, size_t len);
 
     void WBCRYPTO_wbaes_wbgcm_mask_free(WBCRYPTO_wbgcm_mask_context *ctx);
+
+    /**********************Whibox-GCM-Masking File Modes******************************/
+
+    int WBCRYPTO_wbaes_wbgcmfile_mask_encrypt(WBCRYPTO_wbgcm_mask_context *ctx, char *infpath, char *outfpath);
+
+    int WBCRYPTO_wbaes_wbgcmfile_mask_decrypt(WBCRYPTO_wbgcm_mask_context *ctx, char *infpath, char *outfpath);
+
 
 #ifdef __cplusplus
 }

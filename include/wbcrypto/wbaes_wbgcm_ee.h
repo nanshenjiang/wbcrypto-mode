@@ -29,7 +29,6 @@ extern "C" {
     void aux_WBCRYPTO_wbaes_wbgcm_ee_encrypt(const uint8_t *input, uint8_t *output, WBCRYPTO_wbaes_wbgcm_ee_context *ctx);
 
     /**********************Whibox-GCM-EE Modes******************************/
-
     struct wbgcm_ee_context{
         uint64_t len;                   // cipher data length processed so far
         uint64_t add_len;               // total add data length
@@ -62,6 +61,11 @@ extern "C" {
 
     void WBCRYPTO_wbaes_wbgcm_ee_free(WBCRYPTO_wbgcm_ee_context *ctx);
 
+    /**********************Whibox-GCM-EE File Modes******************************/
+
+    int WBCRYPTO_wbaes_wbgcmfile_ee_encrypt(WBCRYPTO_wbgcm_ee_context *ctx, char *infpath, char *outfpath);
+
+    int WBCRYPTO_wbaes_wbgcmfile_ee_decrypt(WBCRYPTO_wbgcm_ee_context *ctx, char *infpath, char *outfpath);
 #ifdef __cplusplus
 }
 #endif

@@ -7,12 +7,9 @@
 #define TEST_CYCLE_NUM 1
 
 //Indicates the path to the file to encrypt and decrypt
-#define WBCRYPTO_TEST_FIN_PATH "../../../test/test-enc-file.txt"
-#define WBCRYPTO_TEST_FENC_PATH "../../../test/test-enc-file.enc.txt"
-#define WBCRYPTO_TEST_FDEC_PATH "../../../test/test-enc-file.dec.txt"
-
-#define WBCRYPTO_TEST_ENC_KEY_FPATH "./enckey.whibox"
-#define WBCRYPTO_TEST_DEC_KEY_FPATH "./deckey.whibox"
+#define WBCRYPTO_TEST_FIN_PATH "../../testData/test-enc-file.txt"
+#define WBCRYPTO_TEST_FENC_PATH "../../testData/test-enc-file.enc.txt"
+#define WBCRYPTO_TEST_FDEC_PATH "../../testData/test-enc-file.dec.txt"
 
 //test util
 //print string in hexadecimal

@@ -54,6 +54,9 @@ $ sudo make install
 $ gcc test.c -o test -lwbcrypto -Wl,-rpath="/usr/local/lib"
 ```
 
+## 文档
+
+在当面目录下的/docs下
 
 ## 额外能力
 

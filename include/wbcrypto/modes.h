@@ -221,8 +221,7 @@ extern "C" {
     * @param len the length of initialization-vec
     * @return 1 if success, 0 if error
     */
-    int WBCRYPTO_gcmfile_setiv(WBCRYPTO_gcmfile_context *ctx,
-                               const unsigned char *iv, size_t len);
+    int WBCRYPTO_gcmfile_setiv(WBCRYPTO_gcmfile_context *ctx, const unsigned char *iv, size_t len);
 
     /**
     * set additional-info
@@ -231,8 +230,7 @@ extern "C" {
     * @param len the length of additional-info
     * @return 1 if success, 0 if error
     */
-    int WBCRYPTO_gcmfile_aad(WBCRYPTO_gcmfile_context *ctx,
-                               const unsigned char *aad, size_t len);
+    int WBCRYPTO_gcmfile_aad(WBCRYPTO_gcmfile_context *ctx, const unsigned char *aad, size_t len);
 
     /**
     * encryption of gcm-file mode
@@ -241,8 +239,7 @@ extern "C" {
     * @param outfpath output file path
     * @return 1 if success, 0 if error
     */
-    int WBCRYPTO_gcmfile_encrypt(WBCRYPTO_gcmfile_context *ctx,
-                                 char *infpath, char *outfpath);
+    int WBCRYPTO_gcmfile_encrypt(WBCRYPTO_gcmfile_context *ctx, char *infpath, char *outfpath);
 
     /**
     * decryption of gcm-file mode
@@ -251,8 +248,7 @@ extern "C" {
     * @param outfpath output file path
     * @return 1 if success, 0 if error
     */
-    int WBCRYPTO_gcmfile_decrypt(WBCRYPTO_gcmfile_context *ctx,
-                                 char *infpath, char *outfpath);
+    int WBCRYPTO_gcmfile_decrypt(WBCRYPTO_gcmfile_context *ctx, char *infpath, char *outfpath);
 
     /**
     * release the context of gcm-file-mode

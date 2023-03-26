@@ -50,6 +50,9 @@ After compilation, the header files, compiled library, and executable files can 
 $ sudo make install
 ```
 
+## Documents
+
+Located in the current directory's /docs.
 
 ## Additional capabilities
 
