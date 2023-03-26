@@ -1,60 +1,58 @@
-# 白盒分组密码工作模式库
+# White-Box Block Cipher Mode Library
 
-本密码库提供Chow的白盒AES实现，肖来的白盒SM4实现，以及多种工作模式，包括：CBC、GCM、并行GCM、WBGCM-EE、WBGCM-Masking、FPE，以及应用类接口：手机号、中国身份证号和中文地址的FPE接口。
+[Chinese Version](./README.CN.md)
 
-## 概述
+**Related paper: Protecting White-Box Block Ciphers with Galois/Counter Mode**
 
-#### 目前支持算法
+This white-box block cipher mode library provides Chow's white-box AES implementation, Xiao's white-box SM4 implementation, and various working modes, including: CBC, GCM, parallel GCM, white-box GCM (paper work), FPE (FF1 and FF3) interfaces, as well as application class APIs: FPE encryption interfaces for mobile phone numbers, Chinese ID numbers, and Chinese addresses.
+
+## Overview
+
+#### Supported algorithms
 
 - sm3
 - aes
-- wbaes - Chow的白盒AES
+- wbaes - Chow's white-box AES
 - sm4
-- wbsm4 - 肖来的白盒SM4
+- wbsm4 - Xiao's white-box SM4
 
-#### 目前支持加密模式
+#### Supported mode of operation
 
-- CBC模式
-- GCM模式
-- 并行GCM模式
-- 白盒GCM模式 - WBGCM-EE和WBGCM-Masking
-- gcmfile模式 - 基于GCM模式加解密文件模式
-- FPE模式 - FF1和FF3加密格式
+- CBC mode
+- GCM mode
+- Parallel GCM mode
+- White-box GCM mode - WBGCM-EE and WBGCM-Masking
+- gcmfile mode - File encryption mode based on GCM mode
+- FPE mode - FF1 and FF3 encryption formats
 
-#### 其他能力
-- 支持手机号、身份证号、姓名、地址的FPE加密
+#### Other capabilities
+- Supports FPE encryption for mobile phone numbers, ID numbers, names, and addresses
 
-## 构建 && 安装
+## Build && Install
 
-### 预先
+### Prerequisites
 
-**请确保编译环境中含gcc和cmake环境，同时安装好openssl库**。
+**Make sure the compilation environment includes gcc and cmake, and that the openssl library is installed.**。
 
-### 快速开始
+### Quick Start
 
-运行下面命令编译库：
+Run the following command to compile the library:
 ```asm
 $ mkdir build && cd build
 $ cmake ..
 $ make -j
 ```
-编译好后，{项目路径}/build/out目录下为头文件和编译库，和可执行文件。
+After compilation, the header files, compiled library, and executable files can be found in the {project path}/build/out directory.
 
-（可选）使用下面命令将头文件和编译库安装至系统全局环境中：
+(Optional) Use the following command to install the header files and compiled library into the global system environment:
 
 ```asm
 $ sudo make install
 ```
 
-假设创建测试文件test.c调用环境变量中的wbcrypto编译库，请指定动态库搜索路径，例如ubuntu环境下：
 
-```asm
-$ gcc test.c -o test -lwbcrypto -Wl,-rpath="/usr/local/lib"
-```
+## Additional capabilities
 
+### MySQL UDF
 
-## 额外能力
-
-### MySQL的UDF函数
-
-在当面目录下的/udf下
+Located in the current directory's /udf.
