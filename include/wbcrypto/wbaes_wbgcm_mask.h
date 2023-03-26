@@ -34,8 +34,7 @@ extern "C" {
                                              WBCRYPTO_wbaes_wbgcm_mask_context *dec_ctx,
                                              const uint8_t *key, size_t keylen);
 
-    void
-    aux_WBCRYPTO_wbaes_wbgcm_mask_encrypt(const uint8_t *input, uint8_t *output, WBCRYPTO_wbaes_wbgcm_mask_context *ctx);
+    void aux_WBCRYPTO_wbaes_wbgcm_mask_encrypt(const uint8_t *input, uint8_t *output, WBCRYPTO_wbaes_wbgcm_mask_context *ctx);
 
     /**********************Whibox-GCM-Masking Modes******************************/
 
@@ -55,11 +54,9 @@ extern "C" {
 
     WBCRYPTO_wbgcm_mask_context *WBCRYPTO_wbaes_wbgcm_mask_init(WBCRYPTO_wbaes_wbgcm_mask_context *key);
 
-    int WBCRYPTO_wbaes_wbgcm_mask_setiv(WBCRYPTO_wbgcm_mask_context *ctx,
-                                        const unsigned char *iv, size_t len);
+    int WBCRYPTO_wbaes_wbgcm_mask_setiv(WBCRYPTO_wbgcm_mask_context *ctx, const unsigned char *iv, size_t len);
 
-    int WBCRYPTO_wbaes_wbgcm_mask_aad(WBCRYPTO_wbgcm_mask_context *ctx,
-                                      const unsigned char *aad, size_t len);
+    int WBCRYPTO_wbaes_wbgcm_mask_aad(WBCRYPTO_wbgcm_mask_context *ctx, const unsigned char *aad, size_t len);
 
     int WBCRYPTO_wbaes_wbgcm_mask_encrypt(WBCRYPTO_wbgcm_mask_context *ctx,
                                           const unsigned char *in, size_t inlen,
@@ -69,8 +66,7 @@ extern "C" {
                                           const unsigned char *in, size_t inlen,
                                           unsigned char *out, size_t outlen);
 
-    int WBCRYPTO_wbaes_wbgcm_mask_finish(WBCRYPTO_wbgcm_mask_context *ctx, unsigned char *tag,
-                                         size_t len);
+    int WBCRYPTO_wbaes_wbgcm_mask_finish(WBCRYPTO_wbgcm_mask_context *ctx, unsigned char *tag, size_t len);
 
     void WBCRYPTO_wbaes_wbgcm_mask_free(WBCRYPTO_wbgcm_mask_context *ctx);
 

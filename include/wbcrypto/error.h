@@ -17,7 +17,7 @@
  * and the detailed cause of the error
  * and jump to the cleanup breakpoint
  */
-#define WBCRYPTO_THROW_REASON(func_msg,res_msg)   \
+#define WBCRYPTO_THROW_REASON(func_msg, res_msg)   \
     do{                                                      \
         printf("A error occurred in the \"%s\" function, the reason is: %s\n",func_msg, res_msg); \
         goto cleanup;                                    \

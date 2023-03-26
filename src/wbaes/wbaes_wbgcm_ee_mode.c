@@ -130,7 +130,7 @@ int WBCRYPTO_wbaes_wbgcm_ee_setiv(WBCRYPTO_wbgcm_ee_context *ctx, const unsigned
         wbgcm_mult(ctx, ctx->y, ctx->y);
     }
     (*block)(ctx->y, ctx->base_ectr, key);
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_ee_aad(WBCRYPTO_wbgcm_ee_context *ctx, const unsigned char *aad, size_t len) {
@@ -149,7 +149,7 @@ int WBCRYPTO_wbaes_wbgcm_ee_aad(WBCRYPTO_wbgcm_ee_context *ctx, const unsigned c
         len -= use_len;
         p += use_len;
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_ee_encrypt(WBCRYPTO_wbgcm_ee_context *ctx,
@@ -199,7 +199,7 @@ int WBCRYPTO_wbaes_wbgcm_ee_encrypt(WBCRYPTO_wbgcm_ee_context *ctx,
         in += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_ee_decrypt(WBCRYPTO_wbgcm_ee_context *ctx,
@@ -250,7 +250,7 @@ int WBCRYPTO_wbaes_wbgcm_ee_decrypt(WBCRYPTO_wbgcm_ee_context *ctx,
         in += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_ee_finish(WBCRYPTO_wbgcm_ee_context *ctx, unsigned char *tag, size_t len) {
@@ -280,7 +280,7 @@ int WBCRYPTO_wbaes_wbgcm_ee_finish(WBCRYPTO_wbgcm_ee_context *ctx, unsigned char
             tag[i] = key->GBOX_TypeIII[i][tag[i]][buff_change[i]];
         }
     }
-    return 0;
+    return 1;
 }
 
 void WBCRYPTO_wbaes_wbgcm_ee_free(WBCRYPTO_wbgcm_ee_context *ctx) {

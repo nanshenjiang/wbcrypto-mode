@@ -46,11 +46,9 @@ extern "C" {
 
     WBCRYPTO_wbgcm_ee_context *WBCRYPTO_wbaes_wbgcm_ee_init(WBCRYPTO_wbaes_wbgcm_ee_context *key);
 
-    int WBCRYPTO_wbaes_wbgcm_ee_setiv(WBCRYPTO_wbgcm_ee_context *ctx,
-                                       const unsigned char *iv, size_t len);
+    int WBCRYPTO_wbaes_wbgcm_ee_setiv(WBCRYPTO_wbgcm_ee_context *ctx, const unsigned char *iv, size_t len);
 
-    int WBCRYPTO_wbaes_wbgcm_ee_aad(WBCRYPTO_wbgcm_ee_context *ctx,
-                                     const unsigned char *aad, size_t len);
+    int WBCRYPTO_wbaes_wbgcm_ee_aad(WBCRYPTO_wbgcm_ee_context *ctx, const unsigned char *aad, size_t len);
 
     int WBCRYPTO_wbaes_wbgcm_ee_encrypt(WBCRYPTO_wbgcm_ee_context *ctx,
                                          const unsigned char *in, size_t inlen,
@@ -60,8 +58,7 @@ extern "C" {
                                          const unsigned char *in, size_t inlen,
                                          unsigned char *out, size_t outlen);
 
-    int WBCRYPTO_wbaes_wbgcm_ee_finish(WBCRYPTO_wbgcm_ee_context *ctx, unsigned char *tag,
-                                        size_t len);
+    int WBCRYPTO_wbaes_wbgcm_ee_finish(WBCRYPTO_wbgcm_ee_context *ctx, unsigned char *tag, size_t len);
 
     void WBCRYPTO_wbaes_wbgcm_ee_free(WBCRYPTO_wbgcm_ee_context *ctx);
 

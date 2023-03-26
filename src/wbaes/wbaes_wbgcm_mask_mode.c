@@ -142,7 +142,7 @@ int WBCRYPTO_wbaes_wbgcm_mask_setiv(WBCRYPTO_wbgcm_mask_context *ctx, const unsi
     for (i = 0; i < 16; i++) {
         ctx->base_ectr[i] = key->GBOX_TypeII[i][ctx->base_ectr[i]];
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_mask_aad(WBCRYPTO_wbgcm_mask_context *ctx,
@@ -162,7 +162,7 @@ int WBCRYPTO_wbaes_wbgcm_mask_aad(WBCRYPTO_wbgcm_mask_context *ctx,
         len -= use_len;
         p += use_len;
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_mask_encrypt(WBCRYPTO_wbgcm_mask_context *ctx,
@@ -217,7 +217,7 @@ int WBCRYPTO_wbaes_wbgcm_mask_encrypt(WBCRYPTO_wbgcm_mask_context *ctx,
         in += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_mask_decrypt(WBCRYPTO_wbgcm_mask_context *ctx,
@@ -272,7 +272,7 @@ int WBCRYPTO_wbaes_wbgcm_mask_decrypt(WBCRYPTO_wbgcm_mask_context *ctx,
         in += use_len;  // bump our input pointer forward
         out += use_len;  // bump our output pointer forward
     }
-    return 0;
+    return 1;
 }
 
 int WBCRYPTO_wbaes_wbgcm_mask_finish(WBCRYPTO_wbgcm_mask_context *ctx, unsigned char *tag,
@@ -303,7 +303,7 @@ int WBCRYPTO_wbaes_wbgcm_mask_finish(WBCRYPTO_wbgcm_mask_context *ctx, unsigned 
             tag[i] = key->GBOX_TypeIII[i][buff_change[i]][tag[i]];
         }
     }
-    return 0;
+    return 1;
 }
 
 void WBCRYPTO_wbaes_wbgcm_mask_free(WBCRYPTO_wbgcm_mask_context *ctx) {
