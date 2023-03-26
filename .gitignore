@@ -5,3 +5,4 @@ cmake-build-debug/
 cmake-build-release/
 udf/build/
 udf/.vscode/
+testData/test_1*
