@@ -43,3 +43,7 @@ TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -fopenmp)
 set(TEST_BUILD_NAME file_encrypt_test)
 add_executable(${TEST_BUILD_NAME} file_encrypt_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
+
+set(TEST_BUILD_NAME perform_file_enc_test)
+add_executable(${TEST_BUILD_NAME} perform_file_enc_test.c test_utils.c)
+TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
