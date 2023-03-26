@@ -85,9 +85,9 @@ extern "C" {
     */
     WBCRYPTO_gcmfile_context *WBCRYPTO_wbaes_gcmfile_init(WBCRYPTO_wbaes_context *key);
 
-    /******************************************fpe-ff1 mode*********************************************/
+    /******************************************fpe mode*********************************************/
     /**
-    * Create a context instance for use with the FF1 algorithm
+    * Create a context instance for use with the FPE algorithm
     * @param key the context of wbaes-algorithm, must be init
     * @param twkbuf: Pointer to tweak data (may be NULL)
     * @param twklen: Number of bytes of tweak data (may be 0)

@@ -40,7 +40,6 @@ extern "C" {
     */
     void WBCRYPTO_wbsm4_context_free(WBCRYPTO_wbsm4_context *ctx);
 
-
     /**
     * the function generate key-tables by the key in the context(the default dummyaround param is 1)
     * @param key key used to generate the key-tables, which need to hide
@@ -150,9 +149,9 @@ extern "C" {
     */
     WBCRYPTO_gcmfile_context *WBCRYPTO_wbsm4_gcmfile_init(WBCRYPTO_wbsm4_context *key);
 
-    /******************************************fpe-ff1 mode*********************************************/
+    /******************************************fpe mode*********************************************/
     /**
-    * Create a context instance for use with the FF1 or FF3 algorithm
+    * Create a context instance for use with the FPE algorithm
     * @param key the context of sm4-algorithm, must be init
     * @param twkbuf: Pointer to tweak data (may be NULL)
     * @param twklen: Number of bytes of tweak data (may be 0)
