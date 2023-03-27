@@ -5,8 +5,6 @@
 #include <wbcrypto/fpe.h>
 #include <time.h>
 
-#define TESTTIME 1
-
 int test_aes_fpe() {
     int i;
 
@@ -25,28 +23,28 @@ int test_aes_fpe() {
     WBCRYPTO_aes_init_key(aes_ctx, key, sizeof(key));
     WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_aes_fpe_init(aes_ctx, tweak, sizeof(tweak), 10);
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff1_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF1] [aes] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF1] [aes] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF1] [aes] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff1_decrypt(fpe_ctx, cipher, plain);
     printf("[FF1] [aes] decrypt answer: %s\n", plain);
 
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff3_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF3] [aes] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF3] [aes] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF3] [aes] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff3_decrypt(fpe_ctx, cipher, plain);
@@ -71,28 +69,28 @@ int test_sm4_fpe() {
     WBCRYPTO_sm4_init_key(sm4_ctx, key, sizeof(key));
     WBCRYPTO_fpe_context *fpe_ctx = WBCRYPTO_sm4_fpe_init(sm4_ctx, tweak, sizeof(tweak), 12);
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff1_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF1] [sm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF1] [sm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF1] [sm4] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff1_decrypt(fpe_ctx, cipher, plain);
     printf("[FF1] [sm4] decrypt answer: %s\n", plain);
 
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff3_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF3] [sm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF3] [sm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF3] [sm4] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff3_decrypt(fpe_ctx, cipher, plain);
@@ -119,28 +117,28 @@ int test_wbsm4_fpe() {
     WBCRYPTO_ff1_encrypt(fpe_ctx, input, cipher);
     WBCRYPTO_ff1_decrypt(fpe_ctx, cipher, plain);
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff1_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF1] [wbsm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF1] [wbsm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF1] [wbsm4] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff1_decrypt(fpe_ctx, cipher, plain);
     printf("[FF1] [wbsm4] decrypt answer: %s\n", plain);
 
     program_start = clock();
-    for (i = 0; i < TESTTIME * 64 * 1024; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_ff3_encrypt(fpe_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FF3] [wbsm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FF3] [wbsm4] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FF3] [wbsm4] encrypt answer: %s\n", cipher);
 
     WBCRYPTO_ff3_decrypt(fpe_ctx, cipher, plain);

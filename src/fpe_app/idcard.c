@@ -15,7 +15,7 @@ aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *
     }
     if (strcmp(sample, "") != 0) {
         for (i = 0; i < len; i++) {
-            if (sample[i] != 'x') {
+            if (sample[i] != '*') {
                 ++tweak_len;
             }
         }
@@ -24,7 +24,7 @@ aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *
     char tweak[tweak_len + 1];
     char ans[len - tweak_len];
     for (i = 0, j = 0, k = 0; i < len; i++) {
-        if (strcmp(sample, "") != 0 && sample[i] != 'x') {
+        if (strcmp(sample, "") != 0 && sample[i] != '*') {
             tweak[k++] = idcard[i];
         } else {
             input[j++] = idcard[i];
@@ -48,7 +48,7 @@ aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *
     (*block)(fpe_ctx, input, ans);
 
     for (i = 0, j = 0; i < len; i++) {
-        if (strcmp(sample, "") != 0 && sample[i] != 'x') {
+        if (strcmp(sample, "") != 0 && sample[i] != '*') {
             after_idcard[i] = idcard[i];
         } else {
             after_idcard[i] = ans[j++];
@@ -59,7 +59,7 @@ aux_fpe_idcard(WBCRYPTO_fpe_app_context *ctx, char *idcard, char *sample, char *
     }
 
     ret = 1;
-    cleanup:
+cleanup:
     WBCRYPTO_fpe_free(fpe_ctx);
     return ret;
 }

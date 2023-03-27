@@ -2,8 +2,6 @@
 #include <wbcrypto/fpe_app.h>
 #include <time.h>
 
-#define TESTTIME 1
-
 int test_fpe_phone() {
     int i;
     const uint8_t key[] = {
@@ -11,7 +9,7 @@ int test_fpe_phone() {
             0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
     };
     const char input[] = "13888888888";
-    const char sample[] = "138xxxxxxxx";
+    const char sample[] = "138****8888";
     char cipher[20] = {0};
     char plain[20] = {0};
     clock_t program_start, program_end;
@@ -20,14 +18,14 @@ int test_fpe_phone() {
     WBCRYPTO_fpe_app_context app_ctx;
     WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
-    for (i = 0; i < TESTTIME; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM; i++) {
         WBCRYPTO_fpe_encrypt_phone(&app_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FPE Phone] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FPE Phone] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FPE Phone] encrypt answer: %s\n", cipher);
     WBCRYPTO_fpe_decrypt_phone(&app_ctx, cipher, plain);
     printf("[FPE Phone] decrypt answer: %s\n", plain);
@@ -45,7 +43,7 @@ int test_fpe_idcard() {
             0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
     };
     const char input[] = "40000000000000000X";
-    const char sample[] = "4412xxxxxxxxxx1234";
+    const char sample[] = "4412**********1234";
     char cipher[20] = {0};
     char plain[20] = {0};
     clock_t program_start, program_end;
@@ -54,14 +52,14 @@ int test_fpe_idcard() {
     WBCRYPTO_fpe_app_context app_ctx;
     WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
-    for (i = 0; i < TESTTIME; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM; i++) {
         WBCRYPTO_fpe_encrypt_idcard(&app_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FPE idcard] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FPE idcard] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FPE idcard] encrypt answer: %s\n", cipher);
     WBCRYPTO_fpe_decrypt_idcard(&app_ctx, cipher, plain);
     printf("[FPE idcard] decrypt answer: %s\n", plain);
@@ -79,7 +77,7 @@ int test_fpe_address() {
             0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
     };
     const char input[] = "广东省广州市天河区华南师范大学";
-    const char sample[] = "xx省xx市xx区xxxxx";
+    const char sample[] = "**************";
     char cipher[100] = {0};
     char plain[100] = {0};
     clock_t program_start, program_end;
@@ -88,14 +86,14 @@ int test_fpe_address() {
     WBCRYPTO_fpe_app_context app_ctx;
     WBCRYPTO_fpe_app_init(&app_ctx, key, sizeof(key), WBCYRPTO_FPE_CIPHER_WBAES, WBCYRPTO_FPE_FFX_FF1);
     program_start = clock();
-    for (i = 0; i < TESTTIME; i++) {
+    for (i = 0; i < TEST_CYCLE_NUM; i++) {
         WBCRYPTO_fpe_encrypt_cn_utf8(&app_ctx, input, cipher);
     }
     program_end = clock();
     ts = program_end - program_start;
     ts = ts / CLOCKS_PER_SEC;
-    printf("[FPE address] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TESTTIME,
-           1 / (ts / TESTTIME));
+    printf("[FPE address] Time cost: %lf s, it means that the encryption speed is: %f MByte/s\n", ts / TEST_CYCLE_NUM,
+           1 / (ts / TEST_CYCLE_NUM));
     printf("[FPE address] encrypt answer: %s\n", cipher);
     WBCRYPTO_fpe_decrypt_cn_utf8(&app_ctx, cipher, plain);
     printf("[FPE address] decrypt answer: %s\n", plain);
