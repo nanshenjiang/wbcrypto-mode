@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+    /******************************************************************
+    * FPE(FF1/FF3)
+    ******************************************************************/
     struct fpe_ctx {
         void *cipher_ctx; // cipher context used
         block128_f block; // encryption algorithm
@@ -110,6 +113,33 @@ extern "C" {
     * @return 1 if success, 0 if error
     */
     int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output);
+
+    /******************************************************************
+    * FPE(FF1/FF3) Mac
+    ******************************************************************/
+    struct fpe_mac_ctx {
+        WBCRYPTO_fpe_context *fpe_ctx;
+        unsigned char tag[16];
+    };
+
+    typedef struct fpe_mac_ctx WBCRYPTO_fpe_mac_context;
+
+    WBCRYPTO_fpe_mac_context *WBCRYPTO_fpe_mac_init(const uint8_t *tweak, size_t twklen, unsigned int radix,
+                                                    void *cipher_ctx, block128_f block);
+
+    void WBCRYPTO_fpe_mac_free(WBCRYPTO_fpe_mac_context *ctx);
+
+    int WBCRYPTO_ff1_cmac_encrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
+
+    int WBCRYPTO_ff1_cmac_decrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
+
+    int WBCRYPTO_ff1_cmac_finish(WBCRYPTO_fpe_mac_context *ctx, const char *tag, size_t len);
+
+    int WBCRYPTO_ff3_gmac_encrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
+
+    int WBCRYPTO_ff3_gmac_decrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
+
+    int WBCRYPTO_ff3_gmac_finish(WBCRYPTO_fpe_mac_context *ctx, const char *tag, size_t len);
 
 #ifdef __cplusplus
 }

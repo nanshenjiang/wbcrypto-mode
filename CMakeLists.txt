@@ -59,5 +59,5 @@ ELSE (UNIT_TEST)
     message(STATUS "${PROJECT_NAME} TEST OFF")
 ENDIF (UNIT_TEST)
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O2 -fopenmp")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -fopenmp")
 

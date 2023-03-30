@@ -258,8 +258,7 @@ cleanup:
     return ret;
 }
 
-int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx, unsigned char *tag,
-                            size_t len){
+int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx, unsigned char *tag, size_t len){
     int ret=0;
     unsigned char work_buf[16];
     uint64_t orig_len     = ctx->len * 8;

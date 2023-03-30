@@ -104,8 +104,7 @@ extern "C" {
      * @param len the length of initialization-vec
      * @return 1 if success, 0 if error
      */
-    int WBCRYPTO_gcm_setiv(WBCRYPTO_gcm_context *ctx,
-                          const unsigned char *iv, size_t len);
+    int WBCRYPTO_gcm_setiv(WBCRYPTO_gcm_context *ctx, const unsigned char *iv, size_t len);
 
     /**
      * set additional-info
@@ -114,8 +113,7 @@ extern "C" {
      * @param len the length of additional-info
      * @return 1 if success, 0 if error
      */
-    int WBCRYPTO_gcm_aad(WBCRYPTO_gcm_context *ctx,
-                          const unsigned char *aad, size_t len);
+    int WBCRYPTO_gcm_aad(WBCRYPTO_gcm_context *ctx, const unsigned char *aad, size_t len);
 
     /**
      * encryption of gcm mode
@@ -150,8 +148,7 @@ extern "C" {
     * @param len the length of tag
     * @return 1 if success, 0 if error
     */
-    int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx,
-                               unsigned char *tag, size_t len);
+    int WBCRYPTO_gcm_finish(WBCRYPTO_gcm_context *ctx, unsigned char *tag, size_t len);
 
     /**
      * release the context of gcm-mode

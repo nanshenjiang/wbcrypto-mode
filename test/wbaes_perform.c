@@ -9,7 +9,7 @@ static const unsigned char msg[16] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 
                                       0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10};
 
 void test_wbaes_standard_perf() {
-    int i;
+    long long i;
     unsigned char cipher[16] = {0};
     double start, end, total;
 
@@ -18,7 +18,7 @@ void test_wbaes_standard_perf() {
     WBCRYPTO_wbaes_gen_table(wbaes_ctx_enc, key, sizeof(key));
 
     start = omp_get_wtime();
-    for (i = 0; i < TEST_CYCLE_NUM * 64 * 1024; i++) {
+    for (i = 0; i < (long long)TEST_CYCLE_NUM * 64 * 1024; i++) {
         WBCRYPTO_wbaes_encrypt(msg, cipher, wbaes_ctx_enc);
     }
     end = omp_get_wtime();
@@ -30,7 +30,7 @@ void test_wbaes_standard_perf() {
 }
 
 void test_wbaes_cbc_perf() {
-    int i;
+    long long i;
     unsigned char iv[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
                             0x0f};
     unsigned char msg1024[1024] = {0};
@@ -46,7 +46,7 @@ void test_wbaes_cbc_perf() {
     WBCRYPTO_wbaes_gen_table(wbaes_ctx_enc, key, sizeof(key));
 
     start = omp_get_wtime();
-    for (i = 0; i < TEST_CYCLE_NUM * 1024; i++) {
+    for (i = 0; i < (long long)TEST_CYCLE_NUM * 1024; i++) {
         WBCRYPTO_wbaes_cbc_encrypt(msg1024, sizeof(msg1024), cipher1024, sizeof(cipher1024), &use_len, wbaes_ctx_enc,
                                    iv);
     }
@@ -58,7 +58,7 @@ void test_wbaes_cbc_perf() {
 }
 
 void test_wbaes_gcm_perf() {
-    int i;
+    long long i;
     unsigned char iv[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
                             0x0f};
     unsigned char aad[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
@@ -79,7 +79,7 @@ void test_wbaes_gcm_perf() {
     WBCRYPTO_gcm_setiv(gcm_enc, iv, sizeof(iv));
     WBCRYPTO_gcm_aad(gcm_enc, aad, sizeof(aad));
     start = omp_get_wtime();
-    for (i = 0; i < TEST_CYCLE_NUM * 1024; i++) {
+    for (i = 0; i < (long long)TEST_CYCLE_NUM * 1024; i++) {
         WBCRYPTO_gcm_encrypt(gcm_enc, msg1024, sizeof(msg1024), cipher1024, sizeof(cipher1024));
     }
     end = omp_get_wtime();
@@ -91,7 +91,7 @@ void test_wbaes_gcm_perf() {
 }
 
 int test_wbaes_gcm_parallel_perf() {
-    int i;
+    long long i;
     unsigned char iv[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
                             0x0f};
     unsigned char aad[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
@@ -112,7 +112,7 @@ int test_wbaes_gcm_parallel_perf() {
     WBCRYPTO_gcm_setiv(gcm_enc, iv, sizeof(iv));
     WBCRYPTO_gcm_aad(gcm_enc, aad, sizeof(aad));
     start = omp_get_wtime();
-    for (i = 0; i < TEST_CYCLE_NUM * 1024; i++) {
+    for (i = 0; i < (long long)TEST_CYCLE_NUM * 1024; i++) {
         WBCRYPTO_gcm_parallel_encrypt(gcm_enc, msg1024, sizeof(msg1024), cipher1024, sizeof(cipher1024));
     }
     end = omp_get_wtime();
