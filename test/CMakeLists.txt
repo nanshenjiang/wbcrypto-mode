@@ -36,6 +36,10 @@ set(TEST_BUILD_NAME fpe_mac_test)
 add_executable(${TEST_BUILD_NAME} fpe_mac_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
 
+set(TEST_BUILD_NAME fpe_mac_perform)
+add_executable(${TEST_BUILD_NAME} fpe_mac_perform.c test_utils.c)
+TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm)
+
 set(TEST_BUILD_NAME sm3_test)
 add_executable(${TEST_BUILD_NAME} sm3_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -O2)
