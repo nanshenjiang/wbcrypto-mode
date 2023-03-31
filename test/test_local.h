@@ -4,7 +4,7 @@
 #include <wbcrypto/conf.h>
 
 //number of test cycle
-#define TEST_CYCLE_NUM 1
+#define TEST_CYCLE_NUM 10
 
 //Indicates the path to the file to encrypt and decrypt
 #define WBCRYPTO_TEST_FIN_PATH "../../testData/test-enc-file.txt"

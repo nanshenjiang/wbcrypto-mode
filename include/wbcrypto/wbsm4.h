@@ -160,6 +160,16 @@ extern "C" {
     */
     WBCRYPTO_fpe_context *WBCRYPTO_wbsm4_fpe_init(WBCRYPTO_wbsm4_context *key, const char *twkbuf, size_t twklen, unsigned int radix);
 
+    /**
+    * Create a context instance for use with the fpe_mac algorithm
+    * @param key the context of aes-algorithm, must be init
+    * @param twkbuf: Pointer to tweak data (may be NULL)
+    * @param twklen: Number of bytes of tweak data (may be 0)
+    * @param radix: The radix of the plain/cipher text data
+    * @param return NULL is fault, otherwise successful
+    */
+    WBCRYPTO_fpe_mac_context *WBCRYPTO_wbsm4_fpe_mac_init(WBCRYPTO_wbsm4_context *key, const char *twkbuf, size_t twklen, unsigned int radix);
+
 #ifdef __cplusplus
 }
 #endif

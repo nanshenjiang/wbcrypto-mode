@@ -13,7 +13,6 @@ static const unsigned char expect_cipher[16] = {0x0A, 0x94, 0x0B, 0xB5, 0x41, 0x
 int test_wbaes() {
     int ret = 0;
     unsigned char cipher[16] = {0};
-    unsigned char msg1024[1024] = {0};
 
     WBCRYPTO_wbaes_context *wbaes_ctx = WBCRYPTO_wbaes_context_init();
     WBCRYPTO_wbaes_gen_table(wbaes_ctx, key, sizeof(key));

@@ -133,13 +133,13 @@ extern "C" {
 
     int WBCRYPTO_ff1_cmac_decrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
 
-    int WBCRYPTO_ff1_cmac_finish(WBCRYPTO_fpe_mac_context *ctx, const char *tag, size_t len);
+    int WBCRYPTO_ff1_cmac_finish(WBCRYPTO_fpe_mac_context *ctx, char *tag, size_t *len);
 
     int WBCRYPTO_ff3_gmac_encrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
 
     int WBCRYPTO_ff3_gmac_decrypt(WBCRYPTO_fpe_mac_context *ctx, const char *input, char *output);
 
-    int WBCRYPTO_ff3_gmac_finish(WBCRYPTO_fpe_mac_context *ctx, const char *tag, size_t len);
+    int WBCRYPTO_ff3_gmac_finish(WBCRYPTO_fpe_mac_context *ctx, char *tag, size_t *len);
 
 #ifdef __cplusplus
 }

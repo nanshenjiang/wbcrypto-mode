@@ -15,7 +15,4 @@
 #define WBCRYPTO_ENCRYPT_MODE 1
 #define WBCRYPTO_DECRYPT_MODE 0
 
-//number of test cycle
-#define TEST_CYCLE_NUM 1
-
 #endif //WBCRYPTO_CONF_H

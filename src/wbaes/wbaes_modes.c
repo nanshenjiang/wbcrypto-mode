@@ -29,3 +29,9 @@ WBCRYPTO_fpe_context *WBCRYPTO_wbaes_fpe_init(WBCRYPTO_wbaes_context *key, const
     WBCRYPTO_fpe_context *ctx = WBCRYPTO_fpe_init(twkbuf, twklen, radix, key, (block128_f)WBCRYPTO_wbaes_encrypt);
     return ctx;
 }
+
+WBCRYPTO_fpe_mac_context *WBCRYPTO_wbaes_fpe_mac_init(WBCRYPTO_wbaes_context *key, const char *twkbuf, size_t twklen, unsigned int radix)
+{
+    WBCRYPTO_fpe_mac_context *ctx = WBCRYPTO_fpe_mac_init(twkbuf, twklen, radix, key, (block128_f)WBCRYPTO_wbaes_encrypt);
+    return ctx;
+}

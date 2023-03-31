@@ -4,7 +4,7 @@
 
 **Related paper: Protecting White-Box Block Ciphers with Galois/Counter Mode**
 
-This white-box block cipher mode library provides Chow's white-box AES implementation, Xiao's white-box SM4 implementation, and various working modes, including: CBC, GCM, parallel GCM, white-box GCM (paper work), FPE (FF1 and FF3) interfaces, as well as application class APIs: FPE encryption interfaces for mobile phone numbers, Chinese ID numbers, and Chinese addresses.
+This white-box block cipher mode library provides Chow's white-box AES implementation, Xiao's white-box SM4 implementation, and various working modes, including: CBC, GCM, parallel GCM, white-box GCM (paper work), FPE (FF1 and FF3)、FPE-MAC (FF1-CMAC and FF3-GMAC) interfaces, as well as application class APIs: FPE encryption interfaces for mobile phone numbers, Chinese ID numbers, and Chinese characters.
 
 ## Overview
 
@@ -24,6 +24,7 @@ This white-box block cipher mode library provides Chow's white-box AES implement
 - White-box GCM mode - WBGCM-EE and WBGCM-Masking
 - gcmfile mode - File encryption mode based on GCM mode
 - FPE mode - FF1 and FF3 encryption formats
+- FPE-MAC mode - FF1-CMAC and FF3-GMAC
 
 #### Other capabilities
 - Supports FPE encryption for mobile phone numbers, ID numbers, names, and addresses

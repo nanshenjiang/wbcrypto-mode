@@ -1,62 +1,5 @@
 #include <wbcrypto/fpe.h>
-#include <stdint.h>
-#include <string.h>
-#include <math.h>
-#include <assert.h>
-#include <openssl/bn.h>
 #include "fpe_locl.h"
-
-void rev_bytes(unsigned char X[], int len) {
-    int hlen = len >> 1;
-    for (int i = 0; i < hlen; ++i) {
-        unsigned char tmp = X[i];
-        X[i] = X[len - i - 1];
-        X[len - i - 1] = tmp;
-    }
-    return;
-}
-
-// convert numeral string in reverse order to number
-void str2num_rev(BIGNUM *Y, const unsigned int *X, unsigned int radix, unsigned int len, BN_CTX *bn_ctx) {
-    BN_CTX_start(bn_ctx);
-    BIGNUM *r = BN_CTX_get(bn_ctx),
-            *x = BN_CTX_get(bn_ctx);
-
-    BN_set_word(Y, 0);
-    BN_set_word(r, radix);
-    for (int i = len - 1; i >= 0; --i) {
-        // Y = Y * radix + X[i]
-        BN_set_word(x, X[i]);
-        BN_mul(Y, Y, r, bn_ctx);
-        BN_add(Y, Y, x);
-    }
-
-    BN_CTX_end(bn_ctx);
-}
-
-// convert number to numeral string in reverse order
-void num2str_rev(const BIGNUM *X, unsigned int *Y, unsigned int radix, int len, BN_CTX *bn_ctx) {
-    BN_CTX_start(bn_ctx);
-    BIGNUM *dv = BN_CTX_get(bn_ctx),
-            *rem = BN_CTX_get(bn_ctx),
-            *r = BN_CTX_get(bn_ctx),
-            *XX = BN_CTX_get(bn_ctx);
-
-    BN_copy(XX, X);
-    BN_set_word(r, radix);
-    memset(Y, 0, len << 2);
-
-    for (int i = 0; i < len; ++i) {
-        // XX / r = dv ... rem
-        BN_div(dv, rem, XX, r, bn_ctx);
-        // Y[i] = XX % r
-        Y[i] = BN_get_word(rem);
-        // XX = XX / r
-        BN_copy(XX, dv);
-    }
-
-    BN_CTX_end(bn_ctx);
-}
 
 int WBCRYPTO_ff3_encrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *output) {
     int ret = 0;
@@ -148,14 +91,6 @@ int WBCRYPTO_ff3_decrypt(WBCRYPTO_fpe_context *ctx, const char *input, char *out
             *qpow_u = BN_new(),
             *qpow_v = BN_new();
     BN_CTX *bn_ctx = BN_CTX_new();
-
-    // AES_KEY aes_enc_ctx;
-    // const uint8_t userKey[] = {
-    //     0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-    //     0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c,
-    // };
-    // AES_set_encrypt_key(userKey, 128, &aes_enc_ctx);
-
 
     unsigned int inlen = strlen(input);
     unsigned int in[inlen], out[inlen];
