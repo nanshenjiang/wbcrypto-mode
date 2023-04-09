@@ -64,6 +64,10 @@ set(TEST_BUILD_NAME wbaes_wbgcm_mask_test)
 add_executable(${TEST_BUILD_NAME} wbaes_wbgcm_mask_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -O2)
 
+set(TEST_BUILD_NAME wbsm4_perform)
+add_executable(${TEST_BUILD_NAME} wbsm4_perform.c test_utils.c)
+TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -fopenmp -O2)
+
 set(TEST_BUILD_NAME wbsm4_test)
 add_executable(${TEST_BUILD_NAME} wbsm4_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -O2)
