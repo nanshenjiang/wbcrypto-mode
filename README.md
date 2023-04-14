@@ -21,10 +21,10 @@ This white-box block cipher mode library provides Chow's white-box AES implement
 - CBC mode
 - GCM mode
 - Parallel GCM mode
-- White-box GCM mode - WBGCM-EE and WBGCM-Masking
-- gcmfile mode - File encryption mode based on GCM mode
-- FPE mode - FF1 and FF3 encryption formats
-- FPE-MAC mode - FF1-CMAC and FF3-GMAC
+- White-box GCM mode : WBGCM-EE and WBGCM-Masking
+- gcmfile mode : File encryption mode based on GCM mode
+- FPE mode : FF1 and FF3 encryption formats
+- FPE-MAC mode : FF1-CMAC and FF3-GMAC
 
 #### Other capabilities
 - Supports FPE encryption for mobile phone numbers, ID numbers, names, and addresses
