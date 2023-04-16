@@ -1,6 +1,6 @@
 # 白盒分组密码工作模式库
 
-**相关论文：Protecting White-Box Block Ciphers with Galois/Counter Mode**
+**相关论文：[Protecting White-Box Block Ciphers with Galois/Counter Mode](https://ieeexplore.ieee.org/abstract/document/9888845/)**
 
 白盒分组密码工作模式库，提供Chow的白盒AES实现，肖来的白盒SM4实现，以及多种工作模式，包括：CBC、GCM、并行GCM、白盒GCM（论文工作）、FPE（FF1和FF3）、FPE认证（FF1-CMAC和FF3-GMAC）等各类API，以及应用类API：手机号、中国身份证号和中文字符的FPE加密接口。
 
