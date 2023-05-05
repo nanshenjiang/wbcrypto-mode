@@ -34,6 +34,7 @@ aux_source_directory(src/aes wbcrypto_src)
 aux_source_directory(src/wbaes wbcrypto_src)
 aux_source_directory(src/sm4 wbcrypto_src)
 aux_source_directory(src/wbsm4 wbcrypto_src)
+aux_source_directory(src/se_wbsm4 wbcrypto_src)
 
 aux_source_directory(src/fpe wbcrypto_src)
 aux_source_directory(src/fpe_app wbcrypto_src)
@@ -43,7 +44,7 @@ add_library(wbcrypto-static ${wbcrypto_src})
 SET_TARGET_PROPERTIES(wbcrypto-static PROPERTIES OUTPUT_NAME "wbcrypto")
 
 # dynamic library
-add_library(wbcrypto SHARED ${wbcrypto_src})
+add_library(wbcrypto SHARED ${wbcrypto_src} src/se_wbsm4/se_wbsm4.c)
 
 # install the header and library files to the environment
 install(DIRECTORY ${WBCRYPTO_INCLUDE_DIR}/ ${WBMATRIX_INCLUDE_DIR}/ DESTINATION include)

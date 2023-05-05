@@ -71,3 +71,7 @@ TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -fopenmp -O
 set(TEST_BUILD_NAME wbsm4_test)
 add_executable(${TEST_BUILD_NAME} wbsm4_test.c test_utils.c)
 TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -O2)
+
+set(TEST_BUILD_NAME se_wbsm4_test)
+add_executable(${TEST_BUILD_NAME} se_wbsm4_test.c test_utils.c)
+TARGET_LINK_LIBRARIES(${TEST_BUILD_NAME} wbcrypto -lssl -lcrypto -lm -O2)
